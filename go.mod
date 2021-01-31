@@ -2,4 +2,12 @@ module github.com/auxten/clink
 
 go 1.14
 
-require github.com/Shopify/sarama v1.27.2
+require (
+	github.com/Shopify/sarama v1.27.2
+	github.com/mattn/go-sqlite3 v1.14.6
+	github.com/pkg/errors v0.9.1
+	github.com/sirupsen/logrus v1.7.0
+	github.com/smartystreets/goconvey v1.6.4
+	github.com/tidwall/gjson v1.6.7
+	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
+)
