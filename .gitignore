@@ -1,4 +1,5 @@
 data/
+clink
 docker-image-patcher
 
 # Created by https://www.toptal.com/developers/gitignore/api/go,vue,intellij+all,macos,python
