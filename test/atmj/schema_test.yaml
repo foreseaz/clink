@@ -1,0 +1,55 @@
+name: schema
+query: |-
+    SELECT SUBSTRING(t1.TRANS_DATE, 0, 10) as trans_date,
+    t1.TRANS_BRAN_CODE as trans_bran_code,
+    ROUND(SUM(t1.TANS_AMT)/10000,2) as balance,
+    count(t1.rowid) as cnt
+    FROM atmj t1
+    WHERE t1.ATMC_TRSCODE in ('INQ', 'LIS', 'CWD', 'CDP', 'TFR', 'PIN', 'REP', 'PAY')
+    AND t1.TRANS_FLAG = '0'
+    GROUP BY SUBSTRING(t1.TRANS_DATE, 0, 11),t1.TRANS_BRAN_CODE
+tables:
+    - name: atmj
+      topic: atmj
+      opttypepath: optype
+      pk: rowid
+      cols:
+        - name: rowid
+          type: string
+          extra: NOT NULL
+          insertpath: rowid
+          updatepath: rowid
+        - name: scntime
+          type: bigint
+          extra: ""
+          insertpath: scntime
+          updatepath: scntime
+        - name: TANS_AMT
+          type: bigint
+          extra: DEFAULT 0
+          insertpath: after.TANS_AMT
+          updatepath: after.TANS_AMT
+        - name: TRANS_FLAG
+          type: string
+          extra: ""
+          insertpath: after.TRANS_FLAG
+          updatepath: after.TRANS_FLAG
+        - name: TRANS_DATE
+          type: date
+          extra: ""
+          insertpath: after.TRANS_DATE
+          updatepath: after.TRANS_DATE
+        - name: TRANS_BRAN_CODE
+          type: string
+          extra: ""
+          insertpath: after.TRANS_BRAN_CODE
+          updatepath: after.TRANS_BRAN_CODE
+        - name: ATMC_TRSCODE
+          type: string
+          extra: ""
+          insertpath: after.ATMC_TRSCODE
+          updatepath: after.ATMC_TRSCODE
+      index:
+        - TRANS_FLAG
+        - TRANS_DATE
+        - TRANS_BRAN_CODE
