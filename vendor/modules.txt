@@ -1,6 +1,11 @@
+# github.com/BurntSushi/toml v0.3.1
+## explicit
 # github.com/Shopify/sarama v1.27.2
 ## explicit
 github.com/Shopify/sarama
+# github.com/auxten/clink-core v0.0.0-20210208054747-d74beef3ad04
+## explicit
+github.com/auxten/clink-core
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
 # github.com/eapache/go-resiliency v1.2.0
@@ -50,9 +55,6 @@ github.com/klauspost/compress/zstd/internal/xxhash
 github.com/leodido/go-urn
 # github.com/mattn/go-isatty v0.0.12
 github.com/mattn/go-isatty
-# github.com/mattn/go-sqlite3 v1.14.6
-## explicit
-github.com/mattn/go-sqlite3
 # github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421
 github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742
