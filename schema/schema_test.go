@@ -76,7 +76,7 @@ GROUP BY SUBSTRING(t1.TRANS_DATE, 0, 10),t1.TRANS_BRAN_CODE`,
 				},
 			},
 			Index: []string{
-				"TRANS_FLAG", "TRANS_DATE",
+				"TRANS_FLAG", "TRANS_DATE", "TRANS_BRAN_CODE",
 			},
 		},
 	},
@@ -125,7 +125,7 @@ func TestSchema(t *testing.T) {
 		So(err, ShouldBeNil)
 		schemaStr, _ := yaml.Marshal(schema)
 		confStr, _ := yaml.Marshal(conf)
-		So(schemaStr, ShouldResemble, confStr)
+		So(string(schemaStr), ShouldResemble, string(confStr))
 	})
 }
 

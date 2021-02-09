@@ -1,4 +1,4 @@
-package engine
+package rowengine
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/auxten/clink/schema"
+	"github.com/auxten/clink/utils"
 )
 
 type Engine struct {
@@ -103,14 +104,34 @@ WHERE type = 'index' AND tbl_name = '%s'
 	return
 }
 
-func (e *Engine) Exec(tbl string, m []byte) (err error) {
+func (e *Engine) Exec(tbl string, query string, args ...interface{}) (err error) {
 	msg := &schema.Msg{
-		Value: m,
+		Value: []byte(query),
 		Table: e.Schema.TableMap[tbl],
 	}
-	if _, err = e.Db.Exec(msg.ToSQL()); err != nil {
+	if _, err = e.Db.Exec(msg.ToSQL(), args...); err != nil {
 		log.WithError(err).Errorf("process msg %s", msg)
 		return
 	}
+	return
+}
+
+func (e *Engine) Query(query string, args ...interface{}) (result [][]interface{}, err error) {
+	var (
+		rows *sql.Rows
+	)
+
+	log.Debugf("Query: %v, Args: %v", query, args)
+
+	if rows, err = e.Db.Query(query, args...); err != nil {
+		log.WithError(err).Errorf("query %s with Args %v", query, args)
+		return
+	}
+	defer rows.Close()
+	if result, err = utils.ReadAllRows(rows); err != nil {
+		log.WithError(err).Errorf("marshal rows to json")
+		return
+	}
+
 	return
 }

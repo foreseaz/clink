@@ -7,11 +7,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/auxten/clink/engine"
+	"github.com/auxten/clink/rowengine"
 	"github.com/auxten/clink/utils"
 )
 
-func newRouter(eng *engine.Engine) (router *gin.Engine) {
+func newRouter(eng *rowengine.Engine) (router *gin.Engine) {
 	router = gin.Default()
 	router.GET("/me", func(c *gin.Context) {
 		c.String(http.StatusOK, "Welcome Clink Server")
@@ -24,7 +24,7 @@ func newRouter(eng *engine.Engine) (router *gin.Engine) {
 		v1 := router.Group("/v1")
 		{
 			v1.Any("/db/query", QueryHandler(eng))
-			v1.Any("/db/exec", exec)
+			//v1.Any("/db/exec", exec)
 		}
 	}
 	return

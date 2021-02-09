@@ -7,7 +7,7 @@ query: |-
     FROM atmj t1
     WHERE t1.ATMC_TRSCODE in ('INQ', 'LIS', 'CWD', 'CDP', 'TFR', 'PIN', 'REP', 'PAY')
     AND t1.TRANS_FLAG = '0'
-    GROUP BY SUBSTRING(t1.TRANS_DATE, 0, 11),t1.TRANS_BRAN_CODE
+    GROUP BY SUBSTRING(t1.TRANS_DATE, 0, 10),t1.TRANS_BRAN_CODE
 tables:
     - name: atmj
       topic: atmj

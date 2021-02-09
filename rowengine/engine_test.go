@@ -1,4 +1,4 @@
-package engine
+package rowengine
 
 import (
 	"bufio"
@@ -34,31 +34,16 @@ func TestEngine(t *testing.T) {
 )`)
 		indexStr, err := eng.ShowIndex()
 		So(err, ShouldBeNil)
-		So(indexStr, ShouldResemble, "CREATE INDEX 'idx__atmj__TRANS_FLAG' ON `atmj` (`TRANS_FLAG`);\nCREATE INDEX 'idx__atmj__TRANS_DATE' ON `atmj` (`TRANS_DATE`);\n")
+		So(indexStr, ShouldResemble, "CREATE INDEX 'idx__atmj__TRANS_FLAG' ON `atmj` (`TRANS_FLAG`);\nCREATE INDEX 'idx__atmj__TRANS_DATE' ON `atmj` (`TRANS_DATE`);\nCREATE INDEX 'idx__atmj__TRANS_BRAN_CODE' ON `atmj` (`TRANS_BRAN_CODE`);\n")
 		f, err := os.Open("../test/atmj/atmj_msg_1000_test.txt")
 		So(err, ShouldBeNil)
 		sc := bufio.NewScanner(f)
 		for sc.Scan() {
-			err = eng.Exec("atmj", sc.Bytes())
+			err = eng.Exec("atmj", sc.Text())
 			So(err, ShouldBeNil)
 		}
-		rows, err := eng.Db.Query(eng.Schema.Query)
+		result, err := eng.Query(eng.Schema.Query)
 		So(err, ShouldBeNil)
-		defer rows.Close()
-		var (
-			transDate     string
-			transBranCode string
-			balance       float64
-			count         int64
-		)
-
-		for rows.Next() {
-			err := rows.Scan(&transDate, &transBranCode, &balance, &count)
-			So(err, ShouldBeNil)
-			fmt.Printf("TRANS_DATE %s\n", transDate)
-			fmt.Printf("TRANS_BRAN_CODE %s\n", transBranCode)
-			fmt.Printf("BALANCE %f\n", balance)
-			fmt.Printf("CNT %d\n", count)
-		}
+		fmt.Printf("Result %s", result)
 	})
 }

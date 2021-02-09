@@ -18,8 +18,8 @@ import (
 	"github.com/Shopify/sarama"
 
 	"github.com/auxten/clink/api"
-	"github.com/auxten/clink/engine"
 	"github.com/auxten/clink/kafka"
+	"github.com/auxten/clink/rowengine"
 	"github.com/auxten/clink/schema"
 )
 
@@ -93,7 +93,7 @@ func main() {
 		return
 	}
 
-	eng := engine.NewEngine(schemaFile, schm)
+	eng := rowengine.NewEngine(schemaFile, schm)
 	if err = eng.InitTables(); err != nil {
 		log.Errorf("init table failed: %v", err)
 		return
@@ -132,7 +132,7 @@ func main() {
 		sc := bufio.NewScanner(f)
 		start := time.Now()
 		for sc.Scan() {
-			if err = eng.Exec(table, sc.Bytes()); err != nil {
+			if err = eng.Exec(table, sc.Text()); err != nil {
 				log.WithError(err).Errorf("processing %s", sc.Text())
 				return
 			}
