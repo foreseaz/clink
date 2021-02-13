@@ -1,0 +1,46 @@
+name: schema
+query: |-
+    SELECT distinct(atmj.trans_bran_code) FROM atmj;
+tables:
+    - name: atmj
+      topic: atmj
+      opttypepath: optype
+      pk: rowid
+      cols:
+        - name: rowid
+          type: string
+          extra: NOT NULL
+          insertpath: rowid
+          updatepath: rowid
+        - name: scntime
+          type: bigint
+          extra: ""
+          insertpath: scntime
+          updatepath: scntime
+        - name: TANS_AMT
+          type: bigint
+          extra: DEFAULT 0
+          insertpath: after.TANS_AMT
+          updatepath: after.TANS_AMT
+        - name: TRANS_FLAG
+          type: string
+          extra: ""
+          insertpath: after.TRANS_FLAG
+          updatepath: after.TRANS_FLAG
+        - name: TRANS_DATE
+          type: date
+          extra: ""
+          insertpath: after.TRANS_DATE
+          updatepath: after.TRANS_DATE
+        - name: TRANS_BRAN_CODE
+          type: string
+          extra: ""
+          insertpath: after.TRANS_BRAN_CODE
+          updatepath: after.TRANS_BRAN_CODE
+        - name: ATMC_TRSCODE
+          type: string
+          extra: ""
+          insertpath: after.ATMC_TRSCODE
+          updatepath: after.ATMC_TRSCODE
+      index:
+
