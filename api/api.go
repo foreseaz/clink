@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/auxten/clink/rowengine"
+	"github.com/auxten/clink/core"
 )
 
 // Query defines single query.
@@ -13,7 +13,7 @@ type Query struct {
 	Args  []interface{} `form:"Args"`
 }
 
-func QueryHandler(eng *rowengine.Engine) func(*gin.Context) {
+func QueryHandler(eng core.Engine) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var (
 			err           error

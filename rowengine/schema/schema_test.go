@@ -9,7 +9,8 @@ import (
 )
 
 var conf = &Schema{
-	Name: "schema",
+	Name:   "schema",
+	Engine: "compact+:memory:",
 	Query: `SELECT SUBSTRING(t1.TRANS_DATE, 0, 10) as trans_date,
 t1.TRANS_BRAN_CODE as trans_bran_code,
 ROUND(SUM(t1.TANS_AMT)/10000,2) as balance,
@@ -115,13 +116,13 @@ func TestSchema(t *testing.T) {
 
 	Convey("Print schema config", t, func() {
 		confByte, err := yaml.Marshal(conf)
-		confByteFromFile, err2 := ioutil.ReadFile("../test/atmj/schema_test.yaml")
+		confByteFromFile, err2 := ioutil.ReadFile("../../test/atmj/schema_test.yaml")
 		So(err, ShouldBeNil)
 		So(err2, ShouldBeNil)
 		So(string(confByte), ShouldResemble, string(confByteFromFile))
 	})
 	Convey("Load schema config", t, func() {
-		schema, err := LoadConf("../test/atmj/schema_test.yaml")
+		schema, err := LoadConf("../../test/atmj/schema_test.yaml")
 		So(err, ShouldBeNil)
 		schemaStr, _ := yaml.Marshal(schema)
 		confStr, _ := yaml.Marshal(conf)

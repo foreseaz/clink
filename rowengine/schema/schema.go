@@ -10,6 +10,7 @@ import (
 
 type Schema struct {
 	Name     string
+	Engine   string
 	Query    string
 	Tables   []Table
 	TableMap map[string]*Table `yaml:"-"` // tableName:table

@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"context"
-	"database/sql"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -19,8 +19,8 @@ import (
 
 	"github.com/auxten/clink/api"
 	"github.com/auxten/clink/kafka"
-	"github.com/auxten/clink/rowengine"
-	"github.com/auxten/clink/schema"
+	"github.com/auxten/clink/ngnx"
+	"github.com/auxten/clink/rowengine/schema"
 )
 
 // Sarama configuration options
@@ -93,7 +93,7 @@ func main() {
 		return
 	}
 
-	eng := rowengine.NewEngine(schemaFile, schm)
+	eng := ngnx.NewEngine(schm.Engine, schemaFile, schm)
 	if err = eng.InitTables(); err != nil {
 		log.Errorf("init table failed: %v", err)
 		return
@@ -116,10 +116,10 @@ func main() {
 
 	if len(dataFile) > 0 {
 		var (
-			f       *os.File
-			table   string
-			rows    *sql.Rows
-			counter int64
+			f             *os.File
+			table         string
+			counter       int64
+			generalResult [][]interface{}
 		)
 		if f, err = os.Open(dataFile); err != nil {
 			log.WithError(err).Errorf("open %s", dataFile)
@@ -142,28 +142,15 @@ func main() {
 		perMsgNano := duration.Nanoseconds() / counter
 		log.Printf("%d messages in %s, %s per message.", counter, duration, time.Duration(perMsgNano))
 
-		if len(eng.Schema.Query) != 0 {
-			rows, err = eng.Db.Query(eng.Schema.Query)
-			defer rows.Close()
-			var (
-				transDate     string
-				transBranCode string
-				balance       float64
-				count         int64
-			)
-
-			for rows.Next() {
-				if err = rows.Scan(&transDate, &transBranCode, &balance, &count); err != nil {
-					log.WithError(err).Errorf("fetching result of %s", eng.Schema.Query)
-					return
-				}
-
-				fmt.Printf("TRANS_DATE %s\n", transDate)
-				fmt.Printf("TRANS_BRAN_CODE %s\n", transBranCode)
-				fmt.Printf("BALANCE %f\n", balance)
-				fmt.Printf("CNT %d\n", count)
+		if len(schm.Query) != 0 {
+			if generalResult, err = eng.Query(schm.Query); err != nil {
+				log.WithError(err).Errorf("marshal rows to json")
+				return
 			}
+			j, _ := json.Marshal(generalResult)
+			fmt.Print(string(j))
 		}
+
 		serv := &api.Server{
 			Port:    apiPort,
 			Address: apiAddr,

@@ -8,7 +8,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/auxten/clink/schema"
+	"github.com/auxten/clink/rowengine/schema"
 )
 
 func TestEngine(t *testing.T) {
@@ -16,7 +16,12 @@ func TestEngine(t *testing.T) {
 		s, err := schema.LoadConf("../test/atmj/schema_test.yaml")
 		So(err, ShouldBeNil)
 
-		eng := NewEngine("atmj", s)
+		eng := Engine{
+			Name:   "atmj",
+			Type:   "sqlite3",
+			Store:  ":memory:",
+			Schema: s,
+		}
 		So(err, ShouldBeNil)
 		err = eng.InitTables()
 		So(err, ShouldBeNil)

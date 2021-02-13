@@ -14,15 +14,15 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/auxten/clink/rowengine"
+	"github.com/auxten/clink/core"
 )
 
 // Server specific settings.
 type Server struct {
-	Port    int               `yaml:"port"` // reserve -1 for random port
-	Address string            `yaml:"address"`
-	Log     string            `yaml:"log"`
-	Engine  *rowengine.Engine `yaml:"-"`
+	Port    int         `yaml:"port"` // reserve -1 for random port
+	Address string      `yaml:"address"`
+	Log     string      `yaml:"log"`
+	Engine  core.Engine `yaml:"-"`
 }
 
 func StartServer(server *Server) {

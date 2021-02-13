@@ -1,4 +1,5 @@
 name: schema
+engine: 'compact+:memory:'
 query: |-
     SELECT SUBSTRING(t1.TRANS_DATE, 0, 10) as trans_date,
     t1.TRANS_BRAN_CODE as trans_bran_code,
