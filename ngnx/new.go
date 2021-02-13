@@ -6,8 +6,8 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/auxten/clink/core"
+	"github.com/auxten/clink/ngncol"
 	"github.com/auxten/clink/ngnrow"
-	"github.com/auxten/clink/ngnrow/schema"
 )
 
 // NewEngine create a new SQL engine.
@@ -22,7 +22,7 @@ import (
 //	| clink+atmj.db    |          Col         | File     |
 //	| column+:memory:  |          Col         | Memory   |
 //	| col+:memory:     |          Col         | Memory   |
-func NewEngine(typeString string, name string, schema *schema.Schema) core.Engine {
+func NewEngine(typeString string, name string, schema *core.Schema) core.Engine {
 	var (
 		store string
 	)
@@ -37,11 +37,17 @@ func NewEngine(typeString string, name string, schema *schema.Schema) core.Engin
 		return &ngnrow.Engine{
 			Name:   name,
 			Type:   "sqlite3",
-			Schema: schema,
 			Store:  store,
+			Schema: schema,
 		}
 
 	case "clink", "col", "column":
+		return &ngncol.Engine{
+			Name:   name,
+			Type:   "clink",
+			Store:  store,
+			Schema: schema,
+		}
 
 	default:
 		log.Fatalf("Unknown engine %s", typ)

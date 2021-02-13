@@ -8,6 +8,7 @@ import (
 	_ "github.com/auxten/clink-core" // clink column store
 	log "github.com/sirupsen/logrus"
 
+	"github.com/auxten/clink/core"
 	"github.com/auxten/clink/ngncol/schema"
 	"github.com/auxten/clink/utils"
 )
@@ -17,7 +18,7 @@ type Engine struct {
 	Type   string
 	Store  string
 	db     *sql.DB
-	Schema *schema.Schema
+	Schema *core.Schema
 }
 
 func (e *Engine) InitTables() (err error) {
@@ -28,7 +29,8 @@ func (e *Engine) InitTables() (err error) {
 
 	err = utils.ExecuteTx(context.Background(), e.db, nil, func(tx *sql.Tx) error {
 		for _, table := range e.Schema.Tables {
-			for _, ddl := range table.DDL() {
+			ddls := schema.GetDDL(&table)
+			for _, ddl := range ddls {
 				_, er := tx.Exec(ddl)
 				if er != nil {
 					log.WithError(er).Errorf("exec sql failed with ddl: %v", ddl)

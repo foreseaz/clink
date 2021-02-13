@@ -4,11 +4,13 @@ import (
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
+
+	"github.com/auxten/clink/core"
 )
 
 func TestMsgToSQL(t *testing.T) {
 	Convey("msg to sql", t, func() {
-		s, err := LoadConf("../../test/atmj/schema_test_ngncol.yaml")
+		s, err := core.LoadConf("../../test/atmj/schema_test_ngncol.yaml")
 		So(err, ShouldBeNil)
 		msg := &Msg{
 			Value: []byte(`{"after":{"TANS_AMT":"100.01","TRANS_FLAG":"P","TRANS_DATE":"2001-03-08 23:21:00",

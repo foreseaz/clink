@@ -6,6 +6,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+
+	"github.com/auxten/clink/core"
 )
 
 /*
@@ -40,7 +42,7 @@ import (
 
 type Msg struct {
 	Value []byte
-	Table *Table
+	Table *core.Table
 }
 
 func isNumeric(s string) bool {
@@ -48,7 +50,7 @@ func isNumeric(s string) bool {
 }
 
 func (m *Msg) String() string {
-	return fmt.Sprintf("%s on %v", m.ToSQL(), m.Table.DDL())
+	return fmt.Sprintf("%s on %v", m.ToSQL(), GetDDL(m.Table))
 }
 
 func (m *Msg) ToSQL() string {

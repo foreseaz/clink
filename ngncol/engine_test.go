@@ -8,12 +8,12 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/auxten/clink/ngncol/schema"
+	"github.com/auxten/clink/core"
 )
 
 func TestEngine(t *testing.T) {
 	Convey("New engine", t, func() {
-		s, err := schema.LoadConf("../test/atmj/schema_test_ngncol.yaml")
+		s, err := core.LoadConf("../test/atmj/schema_test_ngncol.yaml")
 		So(err, ShouldBeNil)
 
 		eng := Engine{
