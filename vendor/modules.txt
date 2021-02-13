@@ -1,6 +1,11 @@
+# github.com/BurntSushi/toml v0.3.1
+## explicit
 # github.com/Shopify/sarama v1.27.2
 ## explicit
 github.com/Shopify/sarama
+# github.com/auxten/clink-core v0.0.0-20210208054747-d74beef3ad04
+## explicit
+github.com/auxten/clink-core
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
 # github.com/eapache/go-resiliency v1.2.0

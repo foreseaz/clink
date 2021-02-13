@@ -9,15 +9,9 @@ import (
 )
 
 var conf = &Schema{
-	Name: "schema",
-	Query: `SELECT SUBSTRING(t1.TRANS_DATE, 0, 10) as trans_date,
-t1.TRANS_BRAN_CODE as trans_bran_code,
-ROUND(SUM(t1.TANS_AMT)/10000,2) as balance,
-count(t1.rowid) as cnt
-FROM atmj t1
-WHERE t1.ATMC_TRSCODE in ('INQ', 'LIS', 'CWD', 'CDP', 'TFR', 'PIN', 'REP', 'PAY')
-AND t1.TRANS_FLAG = '0'
-GROUP BY SUBSTRING(t1.TRANS_DATE, 0, 10),t1.TRANS_BRAN_CODE`,
+	Name:   "schema",
+	Engine: "column+:memory:",
+	Query:  `SELECT SUBSTRING(t1.TRANS_DATE, 0, 10) as trans_date, t1.TRANS_BRAN_CODE as trans_bran_code,ROUND(SUM(t1.TANS_AMT)/10000,2) as balance, count(t1.rowid) as cnt FROM atmj t1 WHERE t1.ATMC_TRSCODE in ('INQ', 'LIS', 'CWD', 'CDP', 'TFR', 'PIN', 'REP', 'PAY') AND t1.TRANS_FLAG = '0' GROUP BY SUBSTRING(t1.TRANS_DATE, 0, 10),t1.TRANS_BRAN_CODE;`,
 	Tables: []Table{
 		{
 			Name:        "atmj",
@@ -115,17 +109,17 @@ func TestSchema(t *testing.T) {
 
 	Convey("Print schema config", t, func() {
 		confByte, err := yaml.Marshal(conf)
-		confByteFromFile, err2 := ioutil.ReadFile("../test/atmj/schema_test.yaml")
+		confByteFromFile, err2 := ioutil.ReadFile("../../test/atmj/schema_test_ngncol.yaml")
 		So(err, ShouldBeNil)
 		So(err2, ShouldBeNil)
 		So(string(confByte), ShouldResemble, string(confByteFromFile))
 	})
 	Convey("Load schema config", t, func() {
-		schema, err := LoadConf("../test/atmj/schema_test.yaml")
+		schema, err := LoadConf("../../test/atmj/schema_test_ngncol.yaml")
 		So(err, ShouldBeNil)
 		schemaStr, _ := yaml.Marshal(schema)
 		confStr, _ := yaml.Marshal(conf)
-		So(schemaStr, ShouldResemble, confStr)
+		So(string(schemaStr), ShouldResemble, string(confStr))
 	})
 }
 
@@ -133,16 +127,16 @@ func TestDDL(t *testing.T) {
 	Convey("Table schema to DDL", t, func() {
 		ddl := conf.Tables[0].DDL()
 		So(ddl[0], ShouldResemble,
-			`CREATE TABLE IF NOT EXISTS 'atmj' (
-'rowid' string PRIMARY KEY NOT NULL,
-'scntime' bigint,
-'TANS_AMT' bigint DEFAULT 0,
-'TRANS_FLAG' string,
-'TRANS_DATE' date,
-'TRANS_BRAN_CODE' string,
-'ATMC_TRSCODE' string
+			`CREATE TABLE IF NOT EXISTS atmj (
+rowid string NOT NULL,
+scntime bigint,
+TANS_AMT bigint DEFAULT 0,
+TRANS_FLAG string,
+TRANS_DATE date,
+TRANS_BRAN_CODE string,
+ATMC_TRSCODE string
 );`)
-		So(ddl[1], ShouldResemble, "CREATE INDEX IF NOT EXISTS 'idx__atmj__TRANS_FLAG' ON `atmj` (`TRANS_FLAG`);")
-		So(ddl[2], ShouldResemble, "CREATE INDEX IF NOT EXISTS 'idx__atmj__TRANS_DATE' ON `atmj` (`TRANS_DATE`);")
+		So(ddl[1], ShouldResemble, "CREATE INDEX IF NOT EXISTS idx__atmj__TRANS_FLAG ON atmj (TRANS_FLAG);")
+		So(ddl[2], ShouldResemble, "CREATE INDEX IF NOT EXISTS idx__atmj__TRANS_DATE ON atmj (TRANS_DATE);")
 	})
 }

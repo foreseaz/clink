@@ -70,7 +70,7 @@ func (m *Msg) ToSQL() string {
 		values = make([]string, 0, len(m.Table.Cols))
 		for _, col := range m.Table.Cols {
 			if insVal := msg.Get(col.InsertPath); insVal.Exists() {
-				cols = append(cols, fmt.Sprintf(`%s`, col.Name))
+				cols = append(cols, fmt.Sprintf("%s", col.Name))
 				if isNumeric(col.Type) {
 					values = append(values, insVal.String())
 				} else {

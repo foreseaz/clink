@@ -26,7 +26,7 @@ func (e *Engine) InitTables() (err error) {
 		return
 	}
 
-	err = ExecuteTx(context.Background(), e.db, nil, func(tx *sql.Tx) error {
+	err = utils.ExecuteTx(context.Background(), e.db, nil, func(tx *sql.Tx) error {
 		for _, table := range e.Schema.Tables {
 			for _, ddl := range table.DDL() {
 				_, er := tx.Exec(ddl)

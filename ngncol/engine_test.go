@@ -13,10 +13,15 @@ import (
 
 func TestEngine(t *testing.T) {
 	Convey("New engine", t, func() {
-		s, err := schema.LoadConf("../test/atmj/schema_test.yaml")
+		s, err := schema.LoadConf("../test/atmj/schema_test_ngncol.yaml")
 		So(err, ShouldBeNil)
 
-		eng := NewEngine("atmj", s)
+		eng := Engine{
+			Name:   "atmj",
+			Type:   "clink",
+			Store:  ":memory:",
+			Schema: s,
+		}
 		So(err, ShouldBeNil)
 		err = eng.InitTables()
 		So(err, ShouldBeNil)
@@ -39,26 +44,11 @@ func TestEngine(t *testing.T) {
 		So(err, ShouldBeNil)
 		sc := bufio.NewScanner(f)
 		for sc.Scan() {
-			err = eng.Exec("atmj", sc.Bytes())
+			err = eng.Exec("atmj", sc.Text())
 			So(err, ShouldBeNil)
 		}
-		rows, err := eng.Db.Query(eng.Schema.Query)
+		result, err := eng.Query(eng.Schema.Query)
 		So(err, ShouldBeNil)
-		defer rows.Close()
-		var (
-			transDate     string
-			transBranCode string
-			balance       float64
-			count         int64
-		)
-
-		for rows.Next() {
-			err := rows.Scan(&transDate, &transBranCode, &balance, &count)
-			So(err, ShouldBeNil)
-			fmt.Printf("TRANS_DATE %s\n", transDate)
-			fmt.Printf("TRANS_BRAN_CODE %s\n", transBranCode)
-			fmt.Printf("BALANCE %f\n", balance)
-			fmt.Printf("CNT %d\n", count)
-		}
+		fmt.Printf("Result %s", result)
 	})
 }
