@@ -137,6 +137,9 @@ func main() {
 				return
 			}
 			counter++
+			if log.GetLevel() > log.WarnLevel && counter%100000 == 0 {
+				log.Debugf("Processing %d lines data", counter)
+			}
 		}
 		duration := time.Since(start)
 		perMsgNano := duration.Nanoseconds() / counter
