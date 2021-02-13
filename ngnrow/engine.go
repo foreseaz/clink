@@ -1,4 +1,4 @@
-package rowengine
+package ngnrow
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/auxten/clink/rowengine/schema"
+	"github.com/auxten/clink/ngnrow/schema"
 	"github.com/auxten/clink/utils"
 )
 

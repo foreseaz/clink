@@ -19,8 +19,8 @@ import (
 
 	"github.com/auxten/clink/api"
 	"github.com/auxten/clink/kafka"
+	"github.com/auxten/clink/ngnrow/schema"
 	"github.com/auxten/clink/ngnx"
-	"github.com/auxten/clink/rowengine/schema"
 )
 
 // Sarama configuration options

@@ -1,4 +1,4 @@
-package rowengine
+package ngnrow
 
 import (
 	"bufio"
@@ -8,7 +8,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/auxten/clink/rowengine/schema"
+	"github.com/auxten/clink/ngnrow/schema"
 )
 
 func TestEngine(t *testing.T) {

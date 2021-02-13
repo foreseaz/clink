@@ -6,8 +6,8 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/auxten/clink/core"
-	"github.com/auxten/clink/rowengine"
-	"github.com/auxten/clink/rowengine/schema"
+	"github.com/auxten/clink/ngnrow"
+	"github.com/auxten/clink/ngnrow/schema"
 )
 
 // NewEngine create a new SQL engine.
@@ -34,7 +34,7 @@ func NewEngine(typeString string, name string, schema *schema.Schema) core.Engin
 	}
 	switch typ {
 	case "compact", "row":
-		return &rowengine.Engine{
+		return &ngnrow.Engine{
 			Name:   name,
 			Type:   "sqlite3",
 			Schema: schema,
