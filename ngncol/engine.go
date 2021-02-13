@@ -1,14 +1,14 @@
-package engine
+package ngncol
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/auxten/clink-core" // clink column store
 	log "github.com/sirupsen/logrus"
 
-	"github.com/auxten/clink/schema"
+	"github.com/auxten/clink/ngncol/schema"
 )
 
 type Engine struct {
@@ -25,8 +25,7 @@ func NewEngine(name string, s *schema.Schema) *Engine {
 }
 
 func (e *Engine) InitTables() (err error) {
-	if e.Db, err = sql.Open("sqlite3",
-		"file::memory:?mode=memory&cache=shared"); err != nil {
+	if e.Db, err = sql.Open("clink", "atmj.db"); err != nil {
 		log.Errorf("open memory engine failed %v", err)
 		return
 	}

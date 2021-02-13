@@ -1,4 +1,4 @@
-package engine
+package ngncol
 
 import (
 	"bufio"
@@ -8,7 +8,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/auxten/clink/schema"
+	"github.com/auxten/clink/ngncol/schema"
 )
 
 func TestEngine(t *testing.T) {

@@ -1,4 +1,6 @@
 data/
+*.db
+*.db.*
 clink
 docker-image-patcher
 

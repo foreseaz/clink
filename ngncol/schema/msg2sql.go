@@ -70,7 +70,7 @@ func (m *Msg) ToSQL() string {
 		values = make([]string, 0, len(m.Table.Cols))
 		for _, col := range m.Table.Cols {
 			if insVal := msg.Get(col.InsertPath); insVal.Exists() {
-				cols = append(cols, fmt.Sprintf("`%s`", col.Name))
+				cols = append(cols, fmt.Sprintf(`%s`, col.Name))
 				if isNumeric(col.Type) {
 					values = append(values, insVal.String())
 				} else {
@@ -104,13 +104,13 @@ func (m *Msg) ToSQL() string {
 					value = fmt.Sprintf(`'%s'`, updateVal.String())
 				}
 				if col.Name == m.Table.Pk {
-					where = append(where, fmt.Sprintf("`%s` = %s", col.Name, value))
+					where = append(where, fmt.Sprintf(`%s = %s`, col.Name, value))
 				} else {
-					sets = append(sets, fmt.Sprintf("`%s` = %s", col.Name, value))
+					sets = append(sets, fmt.Sprintf(`%s = %s`, col.Name, value))
 				}
 			}
 		}
-		sql = fmt.Sprintf("UPDATE %s SET %s WHERE %s;",
+		sql = fmt.Sprintf(`UPDATE %s SET %s WHERE %s;`,
 			m.Table.Name,
 			strings.Join(sets, ", "),
 			strings.Join(where, " AND "),
@@ -121,7 +121,7 @@ func (m *Msg) ToSQL() string {
 			DELETE FROM table WHERE search_condition LIMIT 1;
 		*/
 		if pk := msg.Get(m.Table.Pk); pk.Exists() {
-			sql = fmt.Sprintf("DELETE FROM %s WHERE %s = %s LIMIT 1;", m.Table.Name, m.Table.Pk, pk.String())
+			sql = fmt.Sprintf(`DELETE FROM %s WHERE %s = '%s' LIMIT 1;`, m.Table.Name, m.Table.Pk, pk.String())
 		}
 
 	default:

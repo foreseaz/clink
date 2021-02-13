@@ -67,9 +67,9 @@ func (t *Table) DDL() (ddl []string) {
 	cols := ""
 	for i, col := range t.Cols {
 		if col.Name == t.Pk {
-			cols += fmt.Sprintf(`'%s' %s PRIMARY KEY`, col.Name, col.Type)
+			cols += fmt.Sprintf(`%s %s`, col.Name, col.Type)
 		} else {
-			cols += fmt.Sprintf(`'%s' %s`, col.Name, col.Type)
+			cols += fmt.Sprintf(`%s %s`, col.Name, col.Type)
 		}
 		if col.Extra != "" {
 			cols += fmt.Sprintf(" %s", col.Extra)
@@ -78,12 +78,12 @@ func (t *Table) DDL() (ddl []string) {
 			cols += ",\n"
 		}
 	}
-	ddl[0] = fmt.Sprintf("CREATE TABLE IF NOT EXISTS '%s' (\n%s\n);", t.Name, cols)
+	ddl[0] = fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (\n%s\n);", t.Name, cols)
 
 	for _, idx := range t.Index {
 		ddl = append(ddl,
 			fmt.Sprintf(
-				"CREATE INDEX IF NOT EXISTS 'idx__%s__%s' ON `%s` (`%s`);",
+				`CREATE INDEX IF NOT EXISTS idx__%s__%s ON %s (%s);`,
 				t.Name, idx, t.Name, idx,
 			))
 	}
