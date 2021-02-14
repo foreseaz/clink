@@ -1,3 +1,5 @@
+//+build linux
+
 package ngncol
 
 import (
@@ -86,16 +88,15 @@ WHERE type = 'index' AND tbl_name = '%s'
 			log.WithError(err).Error("get all index failed")
 			return
 		}
+		defer rows.Close()
 		for rows.Next() {
 			var line string
 			if err = rows.Scan(&line); err != nil {
 				log.WithError(err).Error("scan rows of sqlite_master")
-				_ = rows.Close()
 				return
 			}
 			s += line + ";\n"
 		}
-		_ = rows.Close()
 	}
 	return
 }

@@ -1,3 +1,5 @@
+//+build darwin
+
 package ngnx
 
 import (
@@ -6,7 +8,6 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/auxten/clink/core"
-	"github.com/auxten/clink/ngncol"
 	"github.com/auxten/clink/ngnrow"
 )
 
@@ -42,12 +43,7 @@ func NewEngine(typeString string, name string, schema *core.Schema) core.Engine 
 		}
 
 	case "clink", "col", "column":
-		return &ngncol.Engine{
-			Name:   name,
-			Type:   "clink",
-			Store:  store,
-			Schema: schema,
-		}
+		fallthrough
 
 	default:
 		log.Fatalf("Unknown engine %s", typ)

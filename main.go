@@ -18,8 +18,8 @@ import (
 	"github.com/Shopify/sarama"
 
 	"github.com/auxten/clink/api"
+	"github.com/auxten/clink/core"
 	"github.com/auxten/clink/kafka"
-	"github.com/auxten/clink/ngnrow/schema"
 	"github.com/auxten/clink/ngnx"
 )
 
@@ -84,11 +84,11 @@ func main() {
 	}
 
 	var (
-		schm *schema.Schema
+		schm *core.Schema
 		err  error
 	)
 
-	if schm, err = schema.LoadConf(schemaFile); err != nil {
+	if schm, err = core.LoadConf(schemaFile); err != nil {
 		log.WithError(err).Errorf("load schema conf %s", schemaFile)
 		return
 	}
