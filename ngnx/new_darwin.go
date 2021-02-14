@@ -35,19 +35,21 @@ func NewEngine(typeString string, name string, schema *core.Schema) core.Engine 
 	}
 	switch typ {
 	case "compact", "row":
-		return &ngnrow.Engine{
+		eng := &ngnrow.Engine{
 			Name:   name,
 			Type:   "sqlite3",
 			Store:  store,
 			Schema: schema,
 		}
+		log.Debugf("Booting tubro %s with %s store", eng.Type, eng.Store)
+		return eng
 
 	case "clink", "col", "column":
 		fallthrough
 
 	default:
 		log.Fatalf("Unknown engine %s", typ)
-		return nil
 	}
+
 	return nil
 }
