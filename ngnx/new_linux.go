@@ -43,6 +43,7 @@ func NewEngine(typeString string, name string, schema *core.Schema) core.Engine 
 			Store:  store,
 			Schema: schema,
 		}
+		log.Debugf("Booting tubro %s with %s store", eng.(ngnrow.Engine).Type, eng.(ngnrow.Engine).Store)
 
 	case "clink", "col", "column":
 		eng = &ngncol.Engine{
@@ -51,10 +52,11 @@ func NewEngine(typeString string, name string, schema *core.Schema) core.Engine 
 			Store:  store,
 			Schema: schema,
 		}
+		log.Debugf("Booting tubro %s with %s store", eng.(ngncol.Engine).Type, eng.(ngncol.Engine).Store)
 
 	default:
 		log.Fatalf("Unknown engine %s", typ)
 	}
-	log.Debugf("Booting tubro %s with %s store", eng.Type, eng.Store)
+
 	return eng
 }
