@@ -27,6 +27,7 @@ import (
 func NewEngine(typeString string, name string, schema *core.Schema) core.Engine {
 	var (
 		store string
+		eng   core.Engine
 	)
 
 	dsn := strings.Split(typeString, "+")
@@ -36,7 +37,7 @@ func NewEngine(typeString string, name string, schema *core.Schema) core.Engine 
 	}
 	switch typ {
 	case "compact", "row":
-		return &ngnrow.Engine{
+		eng = &ngnrow.Engine{
 			Name:   name,
 			Type:   "sqlite3",
 			Store:  store,
@@ -44,7 +45,7 @@ func NewEngine(typeString string, name string, schema *core.Schema) core.Engine 
 		}
 
 	case "clink", "col", "column":
-		return &ngncol.Engine{
+		eng = &ngncol.Engine{
 			Name:   name,
 			Type:   "clink",
 			Store:  store,
@@ -53,7 +54,7 @@ func NewEngine(typeString string, name string, schema *core.Schema) core.Engine 
 
 	default:
 		log.Fatalf("Unknown engine %s", typ)
-		return nil
 	}
-	return nil
+	log.Debugf("Booting tubro %s with %s store", eng.Type, eng.Store)
+	return eng
 }
