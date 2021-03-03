@@ -162,7 +162,7 @@ func (w *AstWalker) Walk(sql string, ctx interface{}) (ok bool, err error) {
 			case *tree.StrVal:
 			case *tree.Subquery:
 				walk(node.Select)
-			case *tree.TableName:
+			case *tree.TableName, tree.TableName:
 			case *tree.Tuple:
 				for _, expr := range node.Exprs {
 					walk(expr)
