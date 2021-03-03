@@ -214,6 +214,8 @@ func (w *AstWalker) Walk(sql string, ctx interface{}) (ok bool, err error) {
 
 func isColumn(node interface{}) bool {
 	switch node.(type) {
+	case *tree.Subquery:
+		return false
 	case tree.VariableExpr:
 		return true
 	}
