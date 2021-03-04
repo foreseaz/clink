@@ -27,6 +27,7 @@ func (e *Engine) InitTables() (err error) {
 		return
 	}
 
+	e.db.SetMaxOpenConns(1)
 	err = utils.ExecuteTx(context.Background(), e.db, nil, func(tx *sql.Tx) error {
 		for _, table := range e.Schema.Tables {
 			ddls := schema.GetDDL(&table)

@@ -36,6 +36,9 @@ func NewEngine(typeString string, name string, schema *core.Schema) core.Engine 
 	}
 	switch typ {
 	case "compact", "row":
+		if strings.ToLower(store) == "memory" {
+			store = "file::memory:?cache=shared"
+		}
 		eng := &ngnrow.Engine{
 			Name:   name,
 			Type:   "sqlite3",
@@ -46,6 +49,9 @@ func NewEngine(typeString string, name string, schema *core.Schema) core.Engine 
 		return eng
 
 	case "clink", "col", "column":
+		if strings.ToLower(store) == "memory" {
+			store = ":memory:"
+		}
 		eng := &ngncol.Engine{
 			Name:   name,
 			Type:   "clink",

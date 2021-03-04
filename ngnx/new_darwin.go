@@ -16,13 +16,13 @@ import (
 //
 //	| DB String        | Row/Col Based Engine | DB Store |
 //	|------------------|----------------------|----------|
-//	| compact+:memory: |          Row         | Memory   |
+//	| compact+memory   |          Row         | Memory   |
 //	| compact+atmj.db  |          Row         | File     |
 //	| row+atmj.db      |          Row         | File     |
-//	| clink+:memory:   |          Col         | Memory   |
+//	| clink+memory     |          Col         | Memory   |
 //	| clink+atmj.db    |          Col         | File     |
-//	| column+:memory:  |          Col         | Memory   |
-//	| col+:memory:     |          Col         | Memory   |
+//	| column+memory    |          Col         | Memory   |
+//	| col+memory       |          Col         | Memory   |
 func NewEngine(typeString string, name string, schema *core.Schema) core.Engine {
 	var (
 		store string
@@ -35,6 +35,9 @@ func NewEngine(typeString string, name string, schema *core.Schema) core.Engine 
 	}
 	switch typ {
 	case "compact", "row":
+		if strings.ToLower(store) == "memory" {
+			store = "file::memory:?cache=shared"
+		}
 		eng := &ngnrow.Engine{
 			Name:   name,
 			Type:   "sqlite3",
