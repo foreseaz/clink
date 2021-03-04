@@ -99,6 +99,15 @@ func main() {
 		return
 	}
 
+	serv := &api.Server{
+		Port:    apiPort,
+		Address: apiAddr,
+		Log:     logger,
+		Engine:  eng,
+	}
+	// continue here!
+	httpServ := api.StartServer(serv)
+
 	if log.GetLevel() > log.WarnLevel {
 		if schemaStr, err := eng.ShowSchema(); err != nil {
 			log.WithError(err).Error("getting schema")
@@ -154,14 +163,7 @@ func main() {
 			fmt.Print(string(j))
 		}
 
-		serv := &api.Server{
-			Port:    apiPort,
-			Address: apiAddr,
-			Log:     logger,
-			Engine:  eng,
-		}
-		// blocking here!
-		api.StartServer(serv)
+		api.ServerKeeper(httpServ)
 	} else {
 		/*
 			Kafka data source
