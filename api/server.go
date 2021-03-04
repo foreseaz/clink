@@ -25,11 +25,12 @@ type Server struct {
 	Engine  core.Engine `yaml:"-"`
 }
 
-func StartServer(server *Server) {
+func StartServer(server *Server) *http.Server {
 	setupLog(server.Log)
 
+	addr := fmt.Sprintf("%s:%d", server.Address, server.Port)
 	srv := &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", server.Address, server.Port),
+		Addr:    addr,
 		Handler: newRouter(server.Engine),
 	}
 
@@ -41,6 +42,12 @@ func StartServer(server *Server) {
 		}
 	}()
 
+	log.Debugf("Server started on %s", addr)
+
+	return srv
+}
+
+func ServerKeeper(srv *http.Server) {
 	// Wait for interrupt signal to gracefully shutdown the server with
 	// a timeout of 5 seconds.
 	quit := make(chan os.Signal)

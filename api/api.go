@@ -26,7 +26,7 @@ func QueryHandler(eng core.Engine) func(*gin.Context) {
 			return
 		}
 
-		if generalResult, err = eng.Query(query.Query, query.Args); err != nil {
+		if generalResult, err = eng.Query(query.Query, query.Args...); err != nil {
 			log.WithError(err).Errorf("marshal rows to json")
 			c.PureJSON(500, err)
 			return
