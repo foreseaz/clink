@@ -4,7 +4,6 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/auxten/postgresql-parser/pkg/sql/sem/tree"
 	log "github.com/sirupsen/logrus"
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -13,24 +12,21 @@ func TestParser(t *testing.T) {
 	Convey("SQL to AST", t, func() {
 		log.SetLevel(log.DebugLevel)
 		const sql = "SELECT SUBSTR(t1.TRANS_DATE, 0, 10) as trans_date, t1.TRANS_BRAN_CODE as trans_bran_code,ROUND(SUM(t1.TANS_AMT)/10000,2) as balance, count(t1.rowid) as cnt FROM atmj t1 WHERE t1.ATMC_TRSCODE in ('INQ', 'LIS', 'CWD', 'CDP', 'TFR', 'PIN', 'REP', 'PAY') AND t1.TRANS_FLAG = '0' GROUP BY SUBSTR(t1.TRANS_DATE, 0, 10),t1.TRANS_BRAN_CODE ORDER by trans_date;"
-		s, err := sql2ast(sql)
+		ast, err := sql2ast(sql)
 		So(err, ShouldBeNil)
-		//for _, ast := range s {
-		//	log.Debugf("ast: %#v, %s, %t", ast.AST, ast.AST.StatementTag(), ast.AST)
-		//	fmt.Println(tree.Pretty(ast.AST))
-		//}
-		// tree.Select represents a SelectStatement with an ORDER and/or LIMIT.
-		treeSelect := s[0].AST.(*tree.Select)
-		// tree.SelectClause represents a SELECT statement.
-		treeSelectClause := treeSelect.Select.(*tree.SelectClause)
+		So(ast, ShouldNotBeNil)
 
-		referredCols, err := ColNamesInSelect(treeSelect)
+		referredCols, err := ColNamesInSelect(sql)
 		log.Debugf("referredCols %v", referredCols)
 		So(err, ShouldBeNil)
 
-		So(ReferredVarsInExpr(treeSelectClause.Exprs[0].Expr), ShouldResemble, "")
-		So(s.String(), ShouldResemble, "")
-		So(1, ShouldEqual, 1)
+		cols := make([]string, 0, len(referredCols))
+		for k, _ := range referredCols {
+			cols = append(cols, k)
+		}
+		sort.Strings(cols)
+		So(cols, ShouldResemble, []string{"atmc_trscode", "rowid", "tans_amt", "trans_bran_code", "trans_date", "trans_flag"})
+
 	})
 }
 
@@ -194,7 +190,7 @@ func TestReferredVarsInSelectStatement(t *testing.T) {
 	for _, tc := range testCases {
 		Convey(tc.sql, t, func() {
 			referredCols, err := func() (ReferredCols, error) {
-				return ColNamesInSelect2(tc.sql)
+				return ColNamesInSelect(tc.sql)
 			}()
 			So(err, ShouldResemble, tc.err)
 			cols := make([]string, 0, len(tc.cols))

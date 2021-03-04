@@ -14,6 +14,7 @@ type AstWalker struct {
 	UnknownNodes []interface{}
 	fn           func(ctx interface{}, node interface{}) (stop bool)
 }
+type ReferredCols map[string]int
 
 func (w *AstWalker) Walk(sql string, ctx interface{}) (ok bool, err error) {
 	stmts, err := parser.Parse(sql)
@@ -222,7 +223,12 @@ func isColumn(node interface{}) bool {
 	return false
 }
 
-func ColNamesInSelect2(sql string) (referredCols ReferredCols, err error) {
+// ColNamesInSelect finds all referred variables in a Select Statement.
+// (variables = sub-expressions, placeholders, indexed vars, etc.)
+// Implementation limits:
+//	1. Table with AS is not normalized.
+//  2. Columns referred from outer query are not translated.
+func ColNamesInSelect(sql string) (referredCols ReferredCols, err error) {
 	referredCols = make(ReferredCols, 0)
 
 	w := &AstWalker{
