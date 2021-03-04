@@ -20,11 +20,7 @@ func TestParser(t *testing.T) {
 		log.Debugf("referredCols %v", referredCols)
 		So(err, ShouldBeNil)
 
-		cols := make([]string, 0, len(referredCols))
-		for k, _ := range referredCols {
-			cols = append(cols, k)
-		}
-		sort.Strings(cols)
+		cols := referredCols.ToList()
 		So(cols, ShouldResemble, []string{"atmc_trscode", "rowid", "tans_amt", "trans_bran_code", "trans_date", "trans_flag"})
 
 	})
@@ -193,11 +189,7 @@ func TestReferredVarsInSelectStatement(t *testing.T) {
 				return ColNamesInSelect(tc.sql)
 			}()
 			So(err, ShouldResemble, tc.err)
-			cols := make([]string, 0, len(tc.cols))
-			for k, _ := range referredCols {
-				cols = append(cols, k)
-			}
-			sort.Strings(cols)
+			cols := referredCols.ToList()
 			sort.Strings(tc.cols)
 			So(cols, ShouldResemble, tc.cols)
 		})

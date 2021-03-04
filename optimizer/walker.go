@@ -2,6 +2,7 @@ package optimizer
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/auxten/postgresql-parser/pkg/sql/parser"
@@ -15,6 +16,17 @@ type AstWalker struct {
 	fn           func(ctx interface{}, node interface{}) (stop bool)
 }
 type ReferredCols map[string]int
+
+func (rc ReferredCols) ToList() []string {
+	cols := make([]string, len(rc))
+	i := 0
+	for k, _ := range rc {
+		cols[i] = k
+		i++
+	}
+	sort.Strings(cols)
+	return cols
+}
 
 func (w *AstWalker) Walk(sql string, ctx interface{}) (ok bool, err error) {
 	stmts, err := parser.Parse(sql)
@@ -215,6 +227,8 @@ func (w *AstWalker) Walk(sql string, ctx interface{}) (ok bool, err error) {
 
 func isColumn(node interface{}) bool {
 	switch node.(type) {
+	// it's wired that the "Subquery" type is also "VariableExpr" type
+	// we have to ignore that case.
 	case *tree.Subquery:
 		return false
 	case tree.VariableExpr:
@@ -238,6 +252,7 @@ func ColNamesInSelect(sql string) (referredCols ReferredCols, err error) {
 			rCols := ctx.(ReferredCols)
 			if isColumn(node) {
 				nodeName := fmt.Sprint(node)
+				// just drop the "table." part
 				tableCols := strings.Split(nodeName, ".")
 				colName := tableCols[len(tableCols)-1]
 				rCols[colName] = 1
