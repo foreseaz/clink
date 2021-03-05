@@ -13,11 +13,11 @@ import (
 
 func TestEngine(t *testing.T) {
 	Convey("New engine", t, func() {
-		s, err := core.LoadConf("../test/atmj/schema_test.yaml")
+		s, err := core.LoadConf("../test/mj/schema_test.yaml")
 		So(err, ShouldBeNil)
 
 		eng := Engine{
-			Name:   "atmj",
+			Name:   "mj",
 			Type:   "sqlite3",
 			Store:  ":memory:",
 			Schema: s,
@@ -28,23 +28,23 @@ func TestEngine(t *testing.T) {
 		schemaStr, err := eng.ShowSchema()
 		So(err, ShouldBeNil)
 		So(schemaStr, ShouldResemble,
-			`CREATE TABLE 'atmj' (
+			`CREATE TABLE 'mj' (
 'rowid' string PRIMARY KEY NOT NULL,
 'scntime' bigint,
 'TANS_AMT' bigint DEFAULT 0,
 'TRANS_FLAG' string,
 'TRANS_DATE' date,
 'TRANS_BRAN_CODE' string,
-'ATMC_TRSCODE' string
+'MC_TRSCODE' string
 )`)
 		indexStr, err := eng.ShowIndex()
 		So(err, ShouldBeNil)
-		So(indexStr, ShouldResemble, "CREATE INDEX 'idx__atmj__TRANS_FLAG' ON `atmj` (`TRANS_FLAG`);\nCREATE INDEX 'idx__atmj__TRANS_DATE' ON `atmj` (`TRANS_DATE`);\nCREATE INDEX 'idx__atmj__TRANS_BRAN_CODE' ON `atmj` (`TRANS_BRAN_CODE`);\n")
-		f, err := os.Open("../test/atmj/atmj_msg_1000_test.txt")
+		So(indexStr, ShouldResemble, "CREATE INDEX 'idx__mj__TRANS_FLAG' ON `mj` (`TRANS_FLAG`);\nCREATE INDEX 'idx__mj__TRANS_DATE' ON `mj` (`TRANS_DATE`);\nCREATE INDEX 'idx__mj__TRANS_BRAN_CODE' ON `mj` (`TRANS_BRAN_CODE`);\n")
+		f, err := os.Open("../test/mj/mj_msg_1000_test.txt")
 		So(err, ShouldBeNil)
 		sc := bufio.NewScanner(f)
 		for sc.Scan() {
-			err = eng.Exec("atmj", sc.Text())
+			err = eng.Exec("mj", sc.Text())
 			So(err, ShouldBeNil)
 		}
 		result, err := eng.Query(eng.Schema.Query)

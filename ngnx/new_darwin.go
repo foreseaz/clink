@@ -17,10 +17,10 @@ import (
 //	| DB String        | Row/Col Based Engine | DB Store |
 //	|------------------|----------------------|----------|
 //	| compact+memory   |          Row         | Memory   |
-//	| compact+atmj.db  |          Row         | File     |
-//	| row+atmj.db      |          Row         | File     |
+//	| compact+mj.db  |          Row         | File     |
+//	| row+mj.db      |          Row         | File     |
 //	| clink+memory     |          Col         | Memory   |
-//	| clink+atmj.db    |          Col         | File     |
+//	| clink+mj.db    |          Col         | File     |
 //	| column+memory    |          Col         | Memory   |
 //	| col+memory       |          Col         | Memory   |
 func NewEngine(typeString string, name string, schema *core.Schema) core.Engine {

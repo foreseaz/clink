@@ -18,19 +18,19 @@ import (
 		        "TRANS_FLAG": "P",
 		        "TRANS_DATE": "2001-03-08 23:21:00",
 		        "TRANS_BRAN_CODE": "11670103",
-		        "ATMC_TRSCODE": "CWD"
+		        "MC_TRSCODE": "CWD"
 		    },
 		    "rowid": "623481",
 		    "scntime": 984064860,
 		    "optype": "INSERT",
-		    "name": "ATMJ_JOUR"
+		    "name": "MJ_JOUR"
 		}
 	UPDATE:
 		{
 			"rowid": "623481",
 			"scntime": 984064861,
 			"optype": "UPDATE",
-			"name": "ATMJ_JOUR",
+			"name": "MJ_JOUR",
 			"after": {
 				"TRANS_FLAG": "0"
 			},

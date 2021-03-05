@@ -1,17 +1,9 @@
 name: schema
-engine: 'compact+memory'
-query: |-
-    SELECT SUBSTRING(t1.TRANS_DATE, 0, 10) as trans_date,
-    t1.TRANS_BRAN_CODE as trans_bran_code,
-    ROUND(SUM(t1.TANS_AMT)/10000,2) as balance,
-    count(t1.rowid) as cnt
-    FROM atmj t1
-    WHERE t1.ATMC_TRSCODE in ('INQ', 'LIS', 'CWD', 'CDP', 'TFR', 'PIN', 'REP', 'PAY')
-    AND t1.TRANS_FLAG = '0'
-    GROUP BY SUBSTRING(t1.TRANS_DATE, 0, 10),t1.TRANS_BRAN_CODE
+engine: 'column+memory'
+query: SELECT SUBSTRING(t1.TRANS_DATE, 0, 10) as trans_date, t1.TRANS_BRAN_CODE as trans_bran_code,ROUND(SUM(t1.TANS_AMT)/10000,2) as balance, count(t1.rowid) as cnt FROM mj t1 WHERE t1.MC_TRSCODE in ('INQ', 'LIS', 'CWD', 'CDP', 'TFR', 'PIN', 'REP', 'PAY') AND t1.TRANS_FLAG = '0' GROUP BY SUBSTRING(t1.TRANS_DATE, 0, 10),t1.TRANS_BRAN_CODE;
 tables:
-    - name: atmj
-      topic: atmj
+    - name: mj
+      topic: mj
       opttypepath: optype
       pk: rowid
       cols:
@@ -45,12 +37,11 @@ tables:
           extra: ""
           insertpath: after.TRANS_BRAN_CODE
           updatepath: after.TRANS_BRAN_CODE
-        - name: ATMC_TRSCODE
+        - name: MC_TRSCODE
           type: string
           extra: ""
-          insertpath: after.ATMC_TRSCODE
-          updatepath: after.ATMC_TRSCODE
+          insertpath: after.MC_TRSCODE
+          updatepath: after.MC_TRSCODE
       index:
         - TRANS_FLAG
         - TRANS_DATE
-        - TRANS_BRAN_CODE

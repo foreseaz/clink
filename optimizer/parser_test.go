@@ -11,7 +11,7 @@ import (
 func TestParser(t *testing.T) {
 	Convey("SQL to AST", t, func() {
 		log.SetLevel(log.DebugLevel)
-		const sql = "SELECT SUBSTR(t1.TRANS_DATE, 0, 10) as trans_date, t1.TRANS_BRAN_CODE as trans_bran_code,ROUND(SUM(t1.TANS_AMT)/10000,2) as balance, count(t1.rowid) as cnt FROM atmj t1 WHERE t1.ATMC_TRSCODE in ('INQ', 'LIS', 'CWD', 'CDP', 'TFR', 'PIN', 'REP', 'PAY') AND t1.TRANS_FLAG = '0' GROUP BY SUBSTR(t1.TRANS_DATE, 0, 10),t1.TRANS_BRAN_CODE ORDER by trans_date;"
+		const sql = "SELECT SUBSTR(t1.TRANS_DATE, 0, 10) as trans_date, t1.TRANS_BRAN_CODE as trans_bran_code,ROUND(SUM(t1.TANS_AMT)/10000,2) as balance, count(t1.rowid) as cnt FROM mj t1 WHERE t1.MC_TRSCODE in ('INQ', 'LIS', 'CWD', 'CDP', 'TFR', 'PIN', 'REP', 'PAY') AND t1.TRANS_FLAG = '0' GROUP BY SUBSTR(t1.TRANS_DATE, 0, 10),t1.TRANS_BRAN_CODE ORDER by trans_date;"
 		ast, err := sql2ast(sql)
 		So(err, ShouldBeNil)
 		So(ast, ShouldNotBeNil)
@@ -21,7 +21,7 @@ func TestParser(t *testing.T) {
 		So(err, ShouldBeNil)
 
 		cols := referredCols.ToList()
-		So(cols, ShouldResemble, []string{"atmc_trscode", "rowid", "tans_amt", "trans_bran_code", "trans_date", "trans_flag"})
+		So(cols, ShouldResemble, []string{"mc_trscode", "rowid", "tans_amt", "trans_bran_code", "trans_date", "trans_flag"})
 
 	})
 }
@@ -53,7 +53,7 @@ func TestReferredVarsInSelectStatement(t *testing.T) {
 		err  error
 	}{
 		{"SELECT a.r1, a.r2 FROM a ORDER BY a.r3 LIMIT 1", []string{"r1", "r2", "r3"}, nil},
-		{"SELECT SUBSTR(t1.TRANS_DATE, 0, 10) as trans_date, t1.TRANS_BRAN_CODE as trans_bran_code,ROUND(SUM(t1.TANS_AMT)/10000,2) as balance, count(t1.rowid) as cnt FROM atmj t1 WHERE t1.ATMC_TRSCODE in ('INQ', 'LIS', 'CWD', 'CDP', 'TFR', 'PIN', 'REP', 'PAY') AND t1.TRANS_FLAG = '0' GROUP BY SUBSTR(t1.TRANS_DATE, 0, 10),t1.TRANS_BRAN_CODE ORDER by trans_date;", []string{"atmc_trscode", "rowid", "tans_amt", "trans_bran_code", "trans_date", "trans_flag"}, nil},
+		{"SELECT SUBSTR(t1.TRANS_DATE, 0, 10) as trans_date, t1.TRANS_BRAN_CODE as trans_bran_code,ROUND(SUM(t1.TANS_AMT)/10000,2) as balance, count(t1.rowid) as cnt FROM mj t1 WHERE t1.MC_TRSCODE in ('INQ', 'LIS', 'CWD', 'CDP', 'TFR', 'PIN', 'REP', 'PAY') AND t1.TRANS_FLAG = '0' GROUP BY SUBSTR(t1.TRANS_DATE, 0, 10),t1.TRANS_BRAN_CODE ORDER by trans_date;", []string{"mc_trscode", "rowid", "tans_amt", "trans_bran_code", "trans_date", "trans_flag"}, nil},
 		{"SELECT count(DISTINCT s_i_id) FROM order_line JOIN stock ON s_i_id=ol_i_id AND s_w_id=ol_w_id WHERE ol_w_id = $1 AND ol_d_id = $2 AND ol_o_id BETWEEN $3 - 20 AND $3 - 1 AND s_quantity < $4", []string{"s_i_id", "ol_i_id", "s_w_id", "ol_w_id", "ol_d_id", "ol_o_id", "s_quantity"}, nil},
 		{"SELECT c.i / j FROM a AS c JOIN b ON true;", []string{"i", "j"}, nil},
 		{"WITH  with_t1 (c1, c2)   AS (    SELECT 1, 1/0   ) SELECT * FROM with_t1", []string{"*"}, nil},
