@@ -1,5 +1,5 @@
 name: schema
-engine: 'compact+memory'
+engine: 'compact+:memory:'
 query: |-
     SELECT SUBSTRING(t1.TRANS_DATE, 0, 10) as trans_date,
     t1.TRANS_BRAN_CODE as trans_bran_code,
@@ -11,45 +11,48 @@ query: |-
     GROUP BY SUBSTRING(t1.TRANS_DATE, 0, 10),t1.TRANS_BRAN_CODE
 tables:
     - name: mj
-      topic: mj
-      opttypepath: optype
+      type: kafka
+      datasource:
+        endpointconfig: '{"bootstrap.servers": "192.168.10.90:9092,192.168.10.90:9093,192.168.10.90:9094", "broker.address.family": "v4",}'
+        opttypepath: optype
+        topic: mj
       pk: rowid
       cols:
-        - name: rowid
-          type: string
-          extra: NOT NULL
-          insertpath: rowid
-          updatepath: rowid
-        - name: scntime
-          type: bigint
-          extra: ""
-          insertpath: scntime
-          updatepath: scntime
-        - name: TANS_AMT
-          type: bigint
-          extra: DEFAULT 0
-          insertpath: after.TANS_AMT
-          updatepath: after.TANS_AMT
-        - name: TRANS_FLAG
-          type: string
-          extra: ""
-          insertpath: after.TRANS_FLAG
-          updatepath: after.TRANS_FLAG
-        - name: TRANS_DATE
-          type: date
-          extra: ""
-          insertpath: after.TRANS_DATE
-          updatepath: after.TRANS_DATE
-        - name: TRANS_BRAN_CODE
-          type: string
-          extra: ""
-          insertpath: after.TRANS_BRAN_CODE
-          updatepath: after.TRANS_BRAN_CODE
-        - name: MC_TRSCODE
-          type: string
-          extra: ""
-          insertpath: after.MC_TRSCODE
-          updatepath: after.MC_TRSCODE
+          - name: rowid
+            type: string
+            extra: NOT NULL
+            insertpath: rowid
+            updatepath: rowid
+          - name: scntime
+            type: bigint
+            extra: ""
+            insertpath: scntime
+            updatepath: scntime
+          - name: TANS_AMT
+            type: bigint
+            extra: DEFAULT 0
+            insertpath: after.TANS_AMT
+            updatepath: after.TANS_AMT
+          - name: TRANS_FLAG
+            type: string
+            extra: ""
+            insertpath: after.TRANS_FLAG
+            updatepath: after.TRANS_FLAG
+          - name: TRANS_DATE
+            type: date
+            extra: ""
+            insertpath: after.TRANS_DATE
+            updatepath: after.TRANS_DATE
+          - name: TRANS_BRAN_CODE
+            type: string
+            extra: ""
+            insertpath: after.TRANS_BRAN_CODE
+            updatepath: after.TRANS_BRAN_CODE
+          - name: MC_TRSCODE
+            type: string
+            extra: ""
+            insertpath: after.MC_TRSCODE
+            updatepath: after.MC_TRSCODE
       index:
         - TRANS_FLAG
         - TRANS_DATE
