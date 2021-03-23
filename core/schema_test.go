@@ -256,6 +256,7 @@ func TestSchema(t *testing.T) {
 		So(err, ShouldBeNil)
 		So(err2, ShouldBeNil)
 		So(
+			// ignore the annoying auto indent by IDE
 			string(bytes.ReplaceAll(confByte, []byte("  "), []byte(""))),
 			ShouldResemble,
 			string(bytes.ReplaceAll(confByteFromFile, []byte("  "), []byte(""))),

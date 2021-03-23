@@ -13,6 +13,5 @@ require (
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/tidwall/gjson v1.6.7
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
-	gopkg.in/yaml.v2 v2.3.0
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
 )
