@@ -19,6 +19,7 @@ import (
 
 	"github.com/auxten/clink/api"
 	"github.com/auxten/clink/core"
+	"github.com/auxten/clink/fibermsg"
 	"github.com/auxten/clink/kafka"
 	"github.com/auxten/clink/ngnx"
 )
@@ -126,22 +127,24 @@ func main() {
 	if len(dataFile) > 0 {
 		var (
 			f             *os.File
-			table         string
 			counter       int64
 			generalResult [][]interface{}
 		)
 		if f, err = os.Open(dataFile); err != nil {
 			log.WithError(err).Errorf("open %s", dataFile)
 		}
-		if len(schm.Tables) == 1 {
-			table = schm.Tables[0].Name
-		} else {
+		if len(schm.Tables) != 1 {
 			log.Fatal("multi table data file mode tobe implemented")
 		}
 		sc := bufio.NewScanner(f)
 		start := time.Now()
 		for sc.Scan() {
-			if err = eng.Exec(table, sc.Text()); err != nil {
+			msg := &fibermsg.JsonMsg{
+				Value:       sc.Bytes(),
+				Table:       &schm.Tables[0],
+				DMLTypePath: schm.Tables[0].KafkaSrc.OptTypePath,
+			}
+			if err = eng.Exec(msg); err != nil {
 				log.WithError(err).Errorf("processing %s", sc.Text())
 				return
 			}

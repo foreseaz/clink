@@ -12,7 +12,7 @@ query: |-
 tables:
     - name: mj
       type: kafka
-      datasource:
+      kafkasrc:
         endpointconfig: '{"bootstrap.servers": "192.168.10.90:9092,192.168.10.90:9093,192.168.10.90:9094", "broker.address.family": "v4",}'
         opttypepath: optype
         topic: mj

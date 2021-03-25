@@ -41,13 +41,21 @@ type MySQLSrc struct {
 	TTL time.Duration
 }
 
+type LocalFileSrc struct {
+	DataSource `yaml:"-"`
+	// Path is local file path
+	Path string
+}
+
 // Table is the description of table in ngnx.
 type Table struct {
 	Name string
 	// Type is the type of table, eg. kafka/mysql
 	Type string
-	// DataSource is the data source description
-	DataSource DataSource
+	// KafkaSrc, MySQLSrc, LocalFileSrc is all the data sources supported
+	KafkaSrc     KafkaSrc
+	MySQLSrc     MySQLSrc
+	LocalFileSrc LocalFileSrc
 	// Pk is the primary key name.
 	Pk string
 	// Cols are the columns in the Table

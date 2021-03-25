@@ -101,12 +101,8 @@ WHERE type = 'index' AND tbl_name = '%s'
 	return
 }
 
-func (e *Engine) Exec(tbl string, query string, args ...interface{}) (err error) {
-	msg := &schema.Msg{
-		Value: []byte(query),
-		Table: e.Schema.TableMap[tbl],
-	}
-	if _, err = e.db.Exec(msg.ToSQL(), args...); err != nil {
+func (e *Engine) Exec(msg core.FiberMsg) (err error) {
+	if _, err = e.db.Exec(msg.ToDML(e), msg.Args()...); err != nil {
 		log.WithError(err).Errorf("process msg %s", msg)
 		return
 	}

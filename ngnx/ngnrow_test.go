@@ -1,4 +1,4 @@
-package ngnrow
+package ngnx
 
 import (
 	"bufio"
@@ -9,14 +9,16 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 
 	"github.com/auxten/clink/core"
+	"github.com/auxten/clink/fibermsg"
+	"github.com/auxten/clink/ngnrow"
 )
 
-func TestEngine(t *testing.T) {
+func TestEngineRow(t *testing.T) {
 	Convey("New engine", t, func() {
 		s, err := core.LoadConf("../test/mj/schema_test.yaml")
 		So(err, ShouldBeNil)
 
-		eng := Engine{
+		eng := ngnrow.Engine{
 			Name:   "mj",
 			Type:   "sqlite3",
 			Store:  ":memory:",
@@ -44,7 +46,13 @@ func TestEngine(t *testing.T) {
 		So(err, ShouldBeNil)
 		sc := bufio.NewScanner(f)
 		for sc.Scan() {
-			err = eng.Exec("mj", sc.Text())
+			msg := &fibermsg.JsonMsg{
+				Value:       sc.Bytes(),
+				Table:       &s.Tables[0],
+				DMLTypePath: s.Tables[0].KafkaSrc.OptTypePath,
+			}
+
+			err = eng.Exec(msg)
 			So(err, ShouldBeNil)
 		}
 		result, err := eng.Query(eng.Schema.Query)

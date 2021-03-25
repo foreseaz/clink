@@ -1,4 +1,4 @@
-package schema
+package fibermsg
 
 import (
 	"fmt"
@@ -8,6 +8,8 @@ import (
 	"github.com/tidwall/gjson"
 
 	"github.com/auxten/clink/core"
+	"github.com/auxten/clink/ngncol"
+	"github.com/auxten/clink/ngnrow"
 )
 
 /*
@@ -40,27 +42,33 @@ import (
 		}
 */
 
-type Msg struct {
-	Value []byte
-	Table *core.Table
+type JsonMsg struct {
+	Value       []byte
+	Table       *core.Table
+	ArgsA       []interface{}
+	DMLTypePath string
 }
 
 func isNumeric(s string) bool {
 	return strings.Contains(strings.ToLower(s), "int")
 }
 
-func (m *Msg) String() string {
-	return fmt.Sprintf("%s on %v", m.ToSQL(), GetDDL(m.Table))
+func (m *JsonMsg) String() string {
+	return fmt.Sprintf("%s on %s", string(m.Value), m.Table.Name)
 }
 
-func (m *Msg) ToSQL() string {
+func (m *JsonMsg) Args() []interface{} {
+	return m.ArgsA
+}
+
+func (m *JsonMsg) ToDML(eng core.Engine) string {
 	var (
 		sql    string
 		cols   []string
 		values []string
 	)
 	msg := gjson.ParseBytes(m.Value)
-	sqlType := msg.Get(m.Table.OptTypePath)
+	sqlType := msg.Get(m.DMLTypePath)
 	lowerCaseType := strings.ToLower(sqlType.Str)
 	switch lowerCaseType {
 	case "insert":
@@ -72,7 +80,12 @@ func (m *Msg) ToSQL() string {
 		values = make([]string, 0, len(m.Table.Cols))
 		for _, col := range m.Table.Cols {
 			if insVal := msg.Get(col.InsertPath); insVal.Exists() {
-				cols = append(cols, fmt.Sprintf("`%s`", col.Name))
+				switch eng.(type) {
+				case *ngncol.Engine:
+					cols = append(cols, fmt.Sprintf("%s", col.Name))
+				case *ngnrow.Engine:
+					cols = append(cols, fmt.Sprintf("`%s`", col.Name))
+				}
 				if isNumeric(col.Type) {
 					values = append(values, insVal.String())
 				} else {
@@ -105,25 +118,48 @@ func (m *Msg) ToSQL() string {
 				} else {
 					value = fmt.Sprintf(`'%s'`, updateVal.String())
 				}
-				if col.Name == m.Table.Pk {
-					where = append(where, fmt.Sprintf("`%s` = %s", col.Name, value))
-				} else {
-					sets = append(sets, fmt.Sprintf("`%s` = %s", col.Name, value))
+				switch eng.(type) {
+				case *ngncol.Engine:
+					if col.Name == m.Table.Pk {
+						where = append(where, fmt.Sprintf(`%s = %s`, col.Name, value))
+					} else {
+						sets = append(sets, fmt.Sprintf(`%s = %s`, col.Name, value))
+					}
+				case *ngnrow.Engine:
+					if col.Name == m.Table.Pk {
+						where = append(where, fmt.Sprintf("`%s` = %s", col.Name, value))
+					} else {
+						sets = append(sets, fmt.Sprintf("`%s` = %s", col.Name, value))
+					}
 				}
 			}
 		}
-		sql = fmt.Sprintf("UPDATE %s SET %s WHERE %s;",
-			m.Table.Name,
-			strings.Join(sets, ", "),
-			strings.Join(where, " AND "),
-		)
+		switch eng.(type) {
+		case *ngncol.Engine:
+			sql = fmt.Sprintf(`UPDATE %s SET %s WHERE %s;`,
+				m.Table.Name,
+				strings.Join(sets, ", "),
+				strings.Join(where, " AND "),
+			)
+		case *ngnrow.Engine:
+			sql = fmt.Sprintf("UPDATE %s SET %s WHERE %s;",
+				m.Table.Name,
+				strings.Join(sets, ", "),
+				strings.Join(where, " AND "),
+			)
+		}
 
 	case "delete":
 		/*
 			DELETE FROM table WHERE search_condition LIMIT 1;
 		*/
 		if pk := msg.Get(m.Table.Pk); pk.Exists() {
-			sql = fmt.Sprintf("DELETE FROM %s WHERE %s = %s LIMIT 1;", m.Table.Name, m.Table.Pk, pk.String())
+			switch eng.(type) {
+			case *ngncol.Engine:
+				sql = fmt.Sprintf(`DELETE FROM %s WHERE %s = '%s' LIMIT 1;`, m.Table.Name, m.Table.Pk, pk.String())
+			case *ngnrow.Engine:
+				sql = fmt.Sprintf("DELETE FROM %s WHERE %s = %s LIMIT 1;", m.Table.Name, m.Table.Pk, pk.String())
+			}
 		}
 
 	default:
