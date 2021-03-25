@@ -1,0 +1,99 @@
+name: schema
+engine: 'compact+:memory:'
+query: |-
+    SELECT SUBSTRING(t1.TRANS_DATE, 0, 10) as trans_date,
+    t1.TRANS_BRAN_CODE as trans_bran_code,
+    ROUND(SUM(t1.TANS_AMT)/10000,2) as balance,
+    count(t1.rowid) as cnt
+    FROM mj t1
+    WHERE t1.MC_TRSCODE in ('INQ', 'LIS', 'CWD', 'CDP', 'TFR', 'PIN', 'REP', 'PAY')
+    AND t1.TRANS_FLAG = '0'
+    GROUP BY SUBSTRING(t1.TRANS_DATE, 0, 10),t1.TRANS_BRAN_CODE
+tables:
+    - name: mj
+      type: kafka
+      datasource:
+          endpointconfig: '{"bootstrap.servers": "192.168.10.90:9092,192.168.10.90:9093,192.168.10.90:9094", "broker.address.family": "v4",}'
+          opttypepath: optype
+          topic: mj
+      pk: rowid
+      cols:
+          - name: rowid
+            type: string
+            extra: NOT NULL
+            insertpath: rowid
+            updatepath: rowid
+          - name: scntime
+            type: bigint
+            extra: ""
+            insertpath: scntime
+            updatepath: scntime
+          - name: TANS_AMT
+            type: bigint
+            extra: DEFAULT 0
+            insertpath: after.TANS_AMT
+            updatepath: after.TANS_AMT
+          - name: TRANS_FLAG
+            type: string
+            extra: ""
+            insertpath: after.TRANS_FLAG
+            updatepath: after.TRANS_FLAG
+          - name: TRANS_DATE
+            type: date
+            extra: ""
+            insertpath: after.TRANS_DATE
+            updatepath: after.TRANS_DATE
+          - name: TRANS_BRAN_CODE
+            type: string
+            extra: ""
+            insertpath: after.TRANS_BRAN_CODE
+            updatepath: after.TRANS_BRAN_CODE
+          - name: MC_TRSCODE
+            type: string
+            extra: ""
+            insertpath: after.MC_TRSCODE
+            updatepath: after.MC_TRSCODE
+      index:
+          - TRANS_FLAG
+          - TRANS_DATE
+          - TRANS_BRAN_CODE
+    - name: mysql_src1
+      type: mysql
+      datasource:
+          dsn: username:password@protocol(address)/dbname?param=value
+          table: test_table
+          select: ""
+          ttl: 1h0m0s
+      pk: primary
+      cols:
+          - name: primary
+            type: bigint
+            extra: ""
+          - name: idx_col
+            type: int
+            extra: ""
+          - name: income
+            type: int
+            extra: ""
+      index:
+          - idx_col
+    - name: mysql_src2
+      type: mysql
+      datasource:
+          dsn: username:password@protocol(address)/dbname2?param=value
+          table: ""
+          select: SELECT primary2, idx_col2, income2 FROM mysql_src2 ORDER BY income2 DESC LIMIT 1
+          ttl: 2h0m0s
+      pk: primary2
+      cols:
+          - name: primary2
+            type: bigint
+            extra: ""
+          - name: idx_col2
+            type: int
+            extra: ""
+          - name: income2
+            type: int
+            extra: ""
+      index:
+          - idx_col2

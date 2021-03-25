@@ -292,7 +292,7 @@ dmypy.json
 docs/_book
 
 # TODO: where does this rule come from?
-test/
+test/*/*.txt
 
 .DS_Store
 node_modules
