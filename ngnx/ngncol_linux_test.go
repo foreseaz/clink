@@ -32,18 +32,10 @@ func TestEngine(t *testing.T) {
 		schemaStr, err := eng.ShowSchema()
 		So(err, ShouldBeNil)
 		So(schemaStr, ShouldResemble,
-			`CREATE TABLE 'mj' (
-'rowid' string PRIMARY KEY NOT NULL,
-'scntime' bigint,
-'TANS_AMT' bigint DEFAULT 0,
-'TRANS_FLAG' string,
-'TRANS_DATE' date,
-'TRANS_BRAN_CODE' string,
-'MC_TRSCODE' string
-)`)
+			"CREATE TABLE mj(rowid VARCHAR NOT NULL, scntime BIGINT, tans_amt BIGINT DEFAULT(0), trans_flag VARCHAR, trans_date DATE, trans_bran_code VARCHAR, mc_trscode VARCHAR);")
 		indexStr, err := eng.ShowIndex()
 		So(err, ShouldBeNil)
-		So(indexStr, ShouldResemble, "CREATE INDEX 'idx__mj__TRANS_FLAG' ON `mj` (`TRANS_FLAG`);\nCREATE INDEX 'idx__mj__TRANS_DATE' ON `mj` (`TRANS_DATE`);\n")
+		So(indexStr, ShouldResemble, "CREATE INDEX IF NOT EXISTS idx__mj__TRANS_BRAN_CODE ON mj (TRANS_BRAN_CODE);;\nCREATE INDEX IF NOT EXISTS idx__mj__TRANS_FLAG ON mj (TRANS_FLAG);;\nCREATE INDEX IF NOT EXISTS idx__mj__TRANS_DATE ON mj (TRANS_DATE);;\n")
 		f, err := os.Open("../test/mj/mj_msg_1000_test.txt")
 		So(err, ShouldBeNil)
 		sc := bufio.NewScanner(f)

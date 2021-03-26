@@ -14,8 +14,8 @@ MC_TRS_CODE_LIST = ("INQ", "LIS", "CWD", "CDP", "TFR", "PIN", "REP", "PAY", "XXX
 
 start_time = 946656000  # 2000-01-01 00:00:00
 
-with open("./mj_msg_3000000_test.txt", "w") as data:
-    for i in range(3000000):
+with open("./mj_msg_1000_test.txt", "w") as data:
+    for i in range(1000):
         # 步长 1min 增长
         cur_time = start_time + i * 60
         body_insert = {
