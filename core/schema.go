@@ -37,8 +37,14 @@ type MySQLSrc struct {
 	// Table name or a Select query return a table
 	Table  string
 	Select string
-	// TTL is the cache time of the table
+	// if LazyQuery is false, FiberTable is updated automatically by TTL
+	// if LazyQuery is true, FiberTable is updated on clink query cache miss
+	LazyQuery bool
+	// TTL is the cache time of the FiberTable
+	// if TTL == 0, cache is disabled
 	TTL time.Duration
+	// MaxRows is the max number of rows of MySQLSrc Query, only effective on Table name mode
+	MaxRows int64
 }
 
 type LocalFileSrc struct {

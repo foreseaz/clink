@@ -16,6 +16,10 @@ type Engine struct {
 	Schema *core.Schema
 }
 
+func (e *Engine) GetDDL(t *core.Table) (ddl []string) {
+	panic("ngncol not supported under darwin")
+}
+
 func (e *Engine) InitTables() (err error) {
 	panic("ngncol not supported under darwin")
 }

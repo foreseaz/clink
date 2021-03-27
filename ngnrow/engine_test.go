@@ -1,4 +1,4 @@
-package schema
+package ngnrow
 
 import (
 	"testing"
@@ -10,10 +10,10 @@ import (
 
 func TestDDL(t *testing.T) {
 	Convey("Table schema to DDL", t, func() {
-		conf, err := core.LoadConf("../../test/mj/schema_test.yaml")
+		conf, err := core.LoadConf("../test/mj/schema_test.yaml")
 		So(err, ShouldBeNil)
-
-		ddl := GetDDL(&conf.Tables[0])
+		eng := Engine{}
+		ddl := eng.GetDDL(&conf.Tables[0])
 		So(ddl[0], ShouldResemble,
 			`CREATE TABLE IF NOT EXISTS 'mj' (
 'rowid' string PRIMARY KEY NOT NULL,

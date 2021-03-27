@@ -7,6 +7,7 @@ require (
 	github.com/auxten/clink-core v0.0.0-20210208054747-d74beef3ad04
 	github.com/auxten/postgresql-parser v0.0.0-20210218011936-c3325750bd50
 	github.com/gin-gonic/gin v1.6.3
+	github.com/go-sql-driver/mysql v1.5.0
 	github.com/mattn/go-sqlite3 v1.14.6
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.7.0

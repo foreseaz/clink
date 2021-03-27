@@ -1,6 +1,6 @@
 //+build linux
 
-package schema
+package ngncol
 
 import (
 	"testing"
@@ -12,10 +12,10 @@ import (
 
 func TestDDL(t *testing.T) {
 	Convey("Table schema to DDL", t, func() {
-		conf, err := core.LoadConf("../../test/mj/schema_test_ngncol.yaml")
+		conf, err := core.LoadConf("../test/mj/schema_test_ngncol.yaml")
 		So(err, ShouldBeNil)
-
-		ddl := GetDDL(&conf.Tables[0])
+		eng := Engine{}
+		ddl := eng.GetDDL(&conf.Tables[0])
 
 		So(ddl[0], ShouldResemble,
 			`CREATE TABLE IF NOT EXISTS mj (
