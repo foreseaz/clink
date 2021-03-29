@@ -9,8 +9,8 @@ import (
 type rowScanner struct {
 	fieldCnt int
 	column   int           // current column
-	fields   []interface{} // temp fields
-	args     []interface{}
+	fields   []interface{} // type normalized columns
+	args     []interface{} // original columns holders
 }
 
 func newRowScanner(fieldCnt int) (s *rowScanner) {
@@ -85,6 +85,29 @@ func ReadAllRows(rows *sql.Rows) (result [][]interface{}, err error) {
 	}
 
 	err = rows.Err()
+
+	return
+}
+
+// ReadRowsIntoChanAsync reads rows and puts them into the ch channel in background
+// close the rows will make the background job stopped
+func ReadRowsIntoChanAsync(rows *sql.Rows, ch chan []interface{}) (columns []string, err error) {
+	if columns, err = rows.Columns(); err != nil {
+		return
+	}
+
+	go func(rows *sql.Rows, ch chan []interface{}) {
+		rs := newRowScanner(len(columns))
+		defer close(ch)
+		for rows.Next() {
+			err = rows.Scan(rs.scanArgs()...)
+			if err != nil {
+				return
+			}
+
+			ch <- rs.getRow()
+		}
+	}(rows, ch)
 
 	return
 }
