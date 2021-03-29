@@ -1,19 +1,17 @@
-//+build linux
-
 package fibermsg
 
 import (
 	"testing"
 
-	. "github.com/smartystreets/goconvey/convey"
-
 	"github.com/auxten/clink/core"
 	"github.com/auxten/clink/ngnx"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
-func TestJSONMsgToSQLCol(t *testing.T) {
+func TestJSONMsgToSQLRow(t *testing.T) {
 	Convey("json msg to sql", t, func() {
-		s, err := core.LoadConf("../test/mj/schema_test_ngncol.yaml")
+		s, err := core.LoadConf("../test/mj/schema_test.yaml")
 		So(err, ShouldBeNil)
 		msg := &JsonMsg{
 			Value: []byte(`{"after":{"TANS_AMT":"100.01","TRANS_FLAG":"P","TRANS_DATE":"2001-03-08 23:21:00",
@@ -22,12 +20,12 @@ func TestJSONMsgToSQLCol(t *testing.T) {
 			DMLTypePath: s.Tables[0].KafkaSrc.OptTypePath,
 		}
 
-		eng := ngnx.NewEngine("col", "col", s)
-		So(msg.ToDML(eng), ShouldResemble, "INSERT INTO mj (rowid,scntime,TANS_AMT,TRANS_FLAG,TRANS_DATE,TRANS_BRAN_CODE,MC_TRSCODE) VALUES ('623481',984064860,100.01,'P','2001-03-08 23:21:00','11670103','CWD');")
+		eng := ngnx.NewEngine("row", "row", s)
+		So(msg.ToDML(eng), ShouldResemble, "INSERT INTO mj (`rowid`,`scntime`,`TANS_AMT`,`TRANS_FLAG`,`TRANS_DATE`,`TRANS_BRAN_CODE`,`MC_TRSCODE`) VALUES ('623481',984064860,100.01,'P','2001-03-08 23:21:00','11670103','CWD');")
 
 		msg.Value = []byte(`{"rowid":"623481","scntime":984064861,"optype":"UPDATE",
 			"name":"MJ_JOUR","after":{"TRANS_FLAG":"0"},"before":{"TRANS_FLAG":"p"}}`)
 
-		So(msg.ToDML(eng), ShouldResemble, "UPDATE mj SET scntime = 984064861, TRANS_FLAG = '0' WHERE rowid = '623481';")
+		So(msg.ToDML(eng), ShouldResemble, "UPDATE mj SET `scntime` = 984064861, `TRANS_FLAG` = '0' WHERE `rowid` = '623481';")
 	})
 }

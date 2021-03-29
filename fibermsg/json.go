@@ -45,7 +45,7 @@ import (
 type JsonMsg struct {
 	Value       []byte
 	Table       *core.Table
-	ArgsA       []interface{}
+	ArgsA       [][]interface{}
 	DMLTypePath string
 }
 
@@ -57,10 +57,13 @@ func (m *JsonMsg) String() string {
 	return fmt.Sprintf("%s on %s", string(m.Value), m.Table.Name)
 }
 
-func (m *JsonMsg) Args() []interface{} {
+func (m *JsonMsg) DMLArgs(eng core.Engine) [][]interface{} {
 	return m.ArgsA
 }
 
+// FIXME:
+// 1. For ngnrow use "?", args to update and insert
+// 2. Bulk Insert for ngnrow and ngncol
 func (m *JsonMsg) ToDML(eng core.Engine) string {
 	var (
 		sql    string
@@ -76,20 +79,20 @@ func (m *JsonMsg) ToDML(eng core.Engine) string {
 			INSERT INTO table (column1, column2, ...)
 				VALUES(value1, value2, ...);
 		*/
-		cols = make([]string, 0, len(m.Table.Cols))
-		values = make([]string, 0, len(m.Table.Cols))
-		for _, col := range m.Table.Cols {
+		cols = make([]string, len(m.Table.Cols))
+		values = make([]string, len(m.Table.Cols))
+		for i, col := range m.Table.Cols {
 			if insVal := msg.Get(col.InsertPath); insVal.Exists() {
 				switch eng.(type) {
 				case *ngncol.Engine:
-					cols = append(cols, fmt.Sprintf("%s", col.Name))
+					cols[i] = col.Name
 				case *ngnrow.Engine:
-					cols = append(cols, fmt.Sprintf("`%s`", col.Name))
+					cols[i] = "`" + col.Name + "`"
 				}
 				if isNumeric(col.Type) {
-					values = append(values, insVal.String())
+					values[i] = insVal.String()
 				} else {
-					values = append(values, fmt.Sprintf(`'%s'`, insVal.String()))
+					values[i] = "'" + insVal.String() + "'"
 				}
 			}
 		}
@@ -116,20 +119,20 @@ func (m *JsonMsg) ToDML(eng core.Engine) string {
 				if isNumeric(col.Type) {
 					value = updateVal.String()
 				} else {
-					value = fmt.Sprintf(`'%s'`, updateVal.String())
+					value = "'" + updateVal.String() + "'"
 				}
 				switch eng.(type) {
 				case *ngncol.Engine:
 					if col.Name == m.Table.Pk {
-						where = append(where, fmt.Sprintf(`%s = %s`, col.Name, value))
+						where = append(where, col.Name+" = "+value)
 					} else {
-						sets = append(sets, fmt.Sprintf(`%s = %s`, col.Name, value))
+						sets = append(sets, col.Name+" = "+value)
 					}
 				case *ngnrow.Engine:
 					if col.Name == m.Table.Pk {
-						where = append(where, fmt.Sprintf("`%s` = %s", col.Name, value))
+						where = append(where, "`"+col.Name+"` = "+value)
 					} else {
-						sets = append(sets, fmt.Sprintf("`%s` = %s", col.Name, value))
+						sets = append(sets, "`"+col.Name+"` = "+value)
 					}
 				}
 			}
