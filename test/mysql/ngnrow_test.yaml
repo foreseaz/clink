@@ -6,7 +6,7 @@ tables:
     - name: customer_all
       type: mysql
       mysqlsrc:
-          dsn: root:123456@tcp(mysql.test:3306)/stella_test?charset=utf8mb4,utf8&collation=utf8mb4_unicode_ci
+          dsn: test:64fc76bc@tcp(mysql.test:3306)/stella_test?charset=utf8mb4,utf8&collation=utf8mb4_unicode_ci
           table: ""
           select: SELECT ID, orderid, Loan_amount, area, Built_up_area, Location FROM stella_test.customer_all
           ttl: 5m
