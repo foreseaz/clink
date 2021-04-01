@@ -14,8 +14,8 @@ type Query struct {
 }
 
 type QueryResult struct {
-	result  [][]interface{}
-	columns []string
+	result  [][]interface{} `json:"result"`
+	columns []string        `json:"columns"`
 }
 
 func QueryHandler(eng core.Engine) func(*gin.Context) {
