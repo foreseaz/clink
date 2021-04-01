@@ -2,77 +2,66 @@ package utils
 
 import (
 	"database/sql"
-	"io"
-	"time"
+	"reflect"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type rowScanner struct {
 	fieldCnt int
-	column   int           // current column
-	fields   []interface{} // type normalized columns
-	args     []interface{} // original columns holders
+	column   int
+	values   []interface{} // type normalized columns
+	types    []reflect.Type
 }
 
-func newRowScanner(fieldCnt int) (s *rowScanner) {
+func newRowScanner(cts []*sql.ColumnType) (s *rowScanner) {
 	s = &rowScanner{
-		fieldCnt: fieldCnt,
-		column:   0,
-		fields:   make([]interface{}, fieldCnt),
-		args:     make([]interface{}, fieldCnt),
+		fieldCnt: len(cts),
 	}
 
-	for i := 0; i != fieldCnt; i++ {
-		s.args[i] = s
+	s.types = make([]reflect.Type, len(cts))
+	for i, tp := range cts {
+		st := tp.ScanType()
+		if st == nil {
+			log.Debugf("scantype is null for column %q", tp.Name())
+			continue
+		}
+		s.types[i] = st
 	}
 
 	return
 }
 
-func (s *rowScanner) Scan(src interface{}) error {
-	if s.fieldCnt <= s.column {
-		// read complete
-		return io.EOF
-	}
-
-	// type conversions
-	switch srcValue := src.(type) {
-	case []byte:
-		s.fields[s.column] = string(srcValue)
-	case bool:
-		if srcValue {
-			s.fields[s.column] = int8(1)
-		} else {
-			s.fields[s.column] = int8(0)
-		}
-	case time.Time:
-		s.fields[s.column] = srcValue.String()
-	default:
-		s.fields[s.column] = src
-	}
-
-	s.column++
-
-	return nil
-}
-
 func (s *rowScanner) getRow() []interface{} {
-	return s.fields
+	return s.values
 }
 
 func (s *rowScanner) scanArgs() []interface{} {
-	// reset
-	s.column = 0
-	s.fields = make([]interface{}, s.fieldCnt)
-	return s.args
+	s.values = make([]interface{}, s.fieldCnt)
+	for i, t := range s.types {
+		if t == nil {
+			s.values[i] = new(interface{})
+		} else if t.Kind() == reflect.Slice {
+			// varchar will be slice in result
+			s.values[i] = new(string)
+		} else {
+			s.values[i] = reflect.New(t).Interface()
+		}
+	}
+	return s.values
 }
 
-func ReadAllRows(rows *sql.Rows) (result [][]interface{}, err error) {
-	var columns []string
+func ReadAllRowsPtr(rows *sql.Rows) (columns []string, result [][]interface{}, err error) {
 	if columns, err = rows.Columns(); err != nil {
 		return
 	}
 
-	rs := newRowScanner(len(columns))
+	tt, err := rows.ColumnTypes()
+	if err != nil {
+		return
+	}
+
+	rs := newRowScanner(tt)
 	result = make([][]interface{}, 0)
 
 	for rows.Next() {
@@ -97,8 +86,14 @@ func ReadRowsIntoChanAsync(rows *sql.Rows, ch chan []interface{}) (columns []str
 	}
 
 	go func(rows *sql.Rows, ch chan []interface{}) {
-		rs := newRowScanner(len(columns))
 		defer close(ch)
+		tt, err := rows.ColumnTypes()
+		if err != nil {
+			return
+		}
+
+		rs := newRowScanner(tt)
+
 		for rows.Next() {
 			err = rows.Scan(rs.scanArgs()...)
 			if err != nil {
