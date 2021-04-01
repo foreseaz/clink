@@ -53,6 +53,9 @@ func init() {
 	flag.StringVar(&assignor, "assignor", "range", "Consumer group partition assignment strategy (range, roundrobin, sticky)")
 	flag.BoolVar(&oldest, "oldest", true, "Kafka consumer consume initial offset from oldest")
 	flag.BoolVar(&verbose, "verbose", false, "Sarama logging")
+}
+
+func parseFlags() {
 	flag.Parse()
 
 	if len(schemaFile) == 0 {
@@ -78,6 +81,7 @@ func init() {
 }
 
 func main() {
+	parseFlags()
 	log.Println("Starting clink job")
 
 	if verbose {
@@ -158,7 +162,7 @@ func main() {
 		log.Printf("%d messages in %s, %s per message.", counter, duration, time.Duration(perMsgNano))
 
 		if len(schm.Query) != 0 {
-			if generalResult, err = eng.Query(schm.Query); err != nil {
+			if _, generalResult, err = eng.Query(schm.Query); err != nil {
 				log.WithError(err).Errorf("marshal rows to json")
 				return
 			}

@@ -13,12 +13,17 @@ type Query struct {
 	Args  []interface{} `form:"Args"`
 }
 
+type QueryResult struct {
+	result  [][]interface{}
+	columns []string
+}
+
 func QueryHandler(eng core.Engine) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var (
-			err           error
-			query         Query
-			generalResult [][]interface{}
+			err   error
+			query Query
+			qr    QueryResult
 		)
 		if err = c.ShouldBind(&query); err != nil {
 			log.WithError(err).Errorf("processing %v", c.Request)
@@ -26,13 +31,13 @@ func QueryHandler(eng core.Engine) func(*gin.Context) {
 			return
 		}
 
-		if generalResult, err = eng.Query(query.Query, query.Args...); err != nil {
+		if qr.columns, qr.result, err = eng.Query(query.Query, query.Args...); err != nil {
 			log.WithError(err).Errorf("marshal rows to json")
 			c.PureJSON(500, err)
 			return
 		}
 
-		c.PureJSON(200, generalResult)
+		c.PureJSON(200, qr)
 	}
 }
 
