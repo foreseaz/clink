@@ -1,0 +1,28 @@
+name: schema
+engine: 'compact+:memory:'
+query: |-
+    SELECT area, Location, sum(Loan_amount) FROM customer_all GROUP BY area, Location;
+tables:
+    - name: customer_all
+      type: mysql
+      mysqlsrc:
+          dsn: root:123456@tcp(mysql.test:3306)/stella_test?charset=utf8mb4,utf8&collation=utf8mb4_unicode_ci
+          table: ""
+          select: SELECT ID, orderid, Loan_amount, area, Built_up_area, Location FROM stella_test.customer_all
+          ttl: 5m
+      pk: ID
+      cols:
+          - name: ID
+            type: int
+          - name: orderid
+            type: int
+          - name: Loan_amount
+            type: int
+          - name: area
+            type: string
+          - name: Built_up_area
+            type: float
+          - name: Location
+            type: string
+      index:
+          - Location
