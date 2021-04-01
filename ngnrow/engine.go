@@ -143,14 +143,32 @@ WHERE type = 'index' AND tbl_name = '%s'
 }
 
 func (e *Engine) Exec(msg core.FiberMsg) (err error) {
-	if _, err = e.db.Exec(msg.ToDML(e), msg.Args()...); err != nil {
-		log.WithError(err).Errorf("process msg %s", msg)
-		return
+	var (
+		st   *sql.Stmt
+		args [][]interface{}
+	)
+	args = msg.DMLArgs(e)
+	if len(args) == 0 {
+		if _, err = e.db.Exec(msg.ToDML(e)); err != nil {
+			return
+		}
+	} else {
+		st, err = e.db.Prepare(msg.ToDML(e))
+		if err != nil {
+			return err
+		}
+		defer st.Close()
+		for _, arg := range args {
+			if _, err = st.Exec(arg...); err != nil {
+				return err
+			}
+		}
 	}
+
 	return
 }
 
-func (e *Engine) Query(query string, args ...interface{}) (result [][]interface{}, err error) {
+func (e *Engine) Query(query string, args ...interface{}) (columns []string, result [][]interface{}, err error) {
 	var (
 		rows *sql.Rows
 	)
@@ -162,7 +180,7 @@ func (e *Engine) Query(query string, args ...interface{}) (result [][]interface{
 		return
 	}
 	defer rows.Close()
-	if result, err = utils.ReadAllRows(rows); err != nil {
+	if columns, result, err = utils.ReadAllRowsPtr(rows); err != nil {
 		log.WithError(err).Errorf("marshal rows to json")
 		return
 	}

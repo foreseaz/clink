@@ -6,5 +6,5 @@ type Engine interface {
 	ShowSchema() (s string, err error)
 	ShowIndex() (s string, err error)
 	Exec(msg FiberMsg) (err error)
-	Query(query string, args ...interface{}) (result [][]interface{}, err error)
+	Query(query string, args ...interface{}) (columns []string, result [][]interface{}, err error)
 }

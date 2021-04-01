@@ -55,8 +55,9 @@ func TestEngineRow(t *testing.T) {
 			err = eng.Exec(msg)
 			So(err, ShouldBeNil)
 		}
-		result, err := eng.Query(eng.Schema.Query)
+		columns, results, err := eng.Query(eng.Schema.Query)
 		So(err, ShouldBeNil)
-		fmt.Printf("Result %s", result)
+		fmt.Printf("Columns: %s", columns)
+		fmt.Printf("Results: %s", results)
 	})
 }

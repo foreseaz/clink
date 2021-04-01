@@ -36,6 +36,6 @@ func (e *Engine) Exec(msg core.FiberMsg) (err error) {
 	panic("ngncol not supported under darwin")
 }
 
-func (e *Engine) Query(query string, args ...interface{}) (result [][]interface{}, err error) {
+func (e *Engine) Query(query string, args ...interface{}) (columns []string, result [][]interface{}, err error) {
 	panic("ngncol not supported under darwin")
 }
